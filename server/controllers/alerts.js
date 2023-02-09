@@ -26,7 +26,7 @@ export const getTodayAlerts = async (req, res) => {
 
 export const updateAlerts = async() => {
     const octokit = new Octokit({
-        auth: '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'
+        auth: process.env.GITHUB_TOKEN,
       })
       
       await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
