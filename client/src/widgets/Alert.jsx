@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import {Bolt} from '@mui/icons-material';
 
 const Alert = ({ alert }) => {
 
@@ -7,7 +8,7 @@ const Alert = ({ alert }) => {
         <h1>Zone: {alert.zone}</h1>
         <h3>vbucks: {alert.vbucks}</h3>
         <h3>date: {alert.date}</h3>
-        <h3>Power Level: {alert.powerLevel}</h3>
+        <h3>Power Level: <Bolt style={{color: "yellow"}} />{alert.powerLevel}</h3>
     </div>
   );
 }

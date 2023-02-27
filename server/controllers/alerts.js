@@ -1,4 +1,5 @@
 import Alert from "../models/Alert.js";
+import Log from "../models/Log.js";
 
 export const getAlerts = async (req, res) => {
     try {
@@ -10,10 +11,10 @@ export const getAlerts = async (req, res) => {
 }
 
 export const getTodayAlerts = async (req, res) => {
-    const {date} = req.body;
-    console.log("date: ", date);
+    //const {date} = req.body;
+    const date = await Log.find();
     try {
-        const alerts = await Alert.find({date: date});
+        const alerts = await Alert.find({date: date[0].lastUpdated});
         res.status(200).json(alerts);
     } catch (error) {
         res.status(404).json({ message: error.message });
