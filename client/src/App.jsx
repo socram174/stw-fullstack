@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import CssBaseline from '@mui/material/CssBaseline';
-import HomePage from './scenes/HomePage/index.jsx';
-import NavBar from "./scenes/navbar/index.jsx";
+import HomePage from './scenes/HomePage/index';
+import NavBar from "./scenes/navbar/index";
 
 function App() {
 
