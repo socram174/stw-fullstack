@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 
 import Container from '@mui/material/Container';
 
-import AdbIcon from '@mui/icons-material/Adb';
 
 
 function NavBar() {

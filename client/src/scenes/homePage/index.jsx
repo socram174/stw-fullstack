@@ -6,7 +6,7 @@ import AlertTitle from "@mui/material/AlertTitle";
 import Stack from '@mui/material/Stack';
 
 
-const HomePage = () => {
+function HomePage(){
   const [datos, setDatos] = useState([]);
   const [totalVbucks, setTotalVbucks] = useState(0);
   const current = new Date();
