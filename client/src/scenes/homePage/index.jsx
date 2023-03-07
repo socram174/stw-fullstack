@@ -11,6 +11,7 @@ function HomePage(){
   const [totalVbucks, setTotalVbucks] = useState(0);
   const current = new Date();
   const today = format(new Date());
+  const [loading, setLoading] = useState(true);
 
   const noMissions = datos.length == 1 && datos[0].vbucks == 0;
 
@@ -52,6 +53,7 @@ function HomePage(){
       .then((data) => {
         console.log(data);
         setDatos(data);
+        setLoading(false);
       });
   }, []);
   useEffect(() => {
@@ -59,29 +61,33 @@ function HomePage(){
   }, [datos]);
 
   return (
-    <div>
-      {noMissions ? (
-        <div>
-          <Alert variant="outlined" severity="info">
-            <AlertTitle><strong>Info</strong></AlertTitle>
-            No vbucks missions for today.
-          </Alert>
-        </div>
-      ) : (
-        <div>
-          <h1>Vbucks alerts for today: {datos.length}</h1>
-          <h2>{today}</h2>
-          <div >
-          <Stack spacing={2}>
-          {datos.map((dato) => {
-              return <AlertComp alert={dato} />;
-            })}
-      </Stack>
+    <div style={{maxWidth:"1280px", margin:"auto"}}>
+      {loading ? (
+        <h1>Loading...</h1>
+      ): (
+        noMissions ? (
+          <div>
+            <Alert variant="outlined" severity="info">
+              <AlertTitle><strong>Info</strong></AlertTitle>
+              No vbucks missions for today.
+            </Alert>
           </div>
-          <h1>Total vbucks: {totalVbucks}</h1>
-          <h6>V 0.0.1 - 2023</h6>
-        </div>
+        ) : (
+          <div style={{padding: "2rem", color:"white"}}>
+            <h1>Vbucks alerts for today: {datos.length}</h1>
+            <h2>{today}</h2>
+            <div >
+            <Stack spacing={2}>
+            {datos.map((dato) => {
+                return <AlertComp alert={dato} />;
+              })}
+        </Stack>
+            </div>
+            <h1>Total vbucks: {totalVbucks}</h1>
+          </div>
+        )
       )}
+      <h6>V 0.0.2 - 2023</h6>
     </div>
   );
 };

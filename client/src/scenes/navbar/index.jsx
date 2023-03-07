@@ -11,8 +11,8 @@ import Container from '@mui/material/Container';
 
 function NavBar() {
   return (
-    <AppBar position="static">
-      <Container maxWidth="xl" sx={{bgcolor: "#4c5c68"}}>
+    <AppBar position="fixed">
+      <Container maxWidth="false" sx={{bgcolor: "#4c5c68"}}>
         <Toolbar disableGutters>
           
           <Typography
@@ -30,7 +30,7 @@ function NavBar() {
               textDecoration: 'none',
             }}
           >
-            <img src='/Icon_VBucks.webp' width={"30px"}/> STW Alerts
+            <img src='/Icon_VBucks.webp' width={"30px"} style={{marginRight:"5px"}}/> STW Alerts
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}></Box>
