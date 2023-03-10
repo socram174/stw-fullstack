@@ -6,7 +6,11 @@ const AlertComp = ({ alert }) => {
 
   return (
     <Box sx={{ border: "5px solid green",backgroundColor: "#8a817c", color: "black", borderRadius:"15px" }}>
-        <h1 style={{color: "#660708"}}>Zone: {alert.zone}</h1>
+        {alert.zone === "N/A" ? (
+          <h1 style={{color: "#660708"}}>Zone: {alert.zone}</h1>
+        ) : (
+          <h1 style={{color: "#660708"}}>Zone: {alert.zone.name}</h1>
+        )}
         <h3 style={{color: "#3c6e71"}}>vbucks: {alert.vbucks}</h3>
         <h3>date: {alert.date}</h3>
         <h3>Power Level: <Bolt style={{color: "yellow"}} />{alert.powerLevel}</h3>

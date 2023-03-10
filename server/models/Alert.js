@@ -4,7 +4,7 @@ const AlertSchema = new mongoose.Schema({
     date: String,
     powerLevel: Number,
     vbucks: Number,
-    zone: String,
+    zone: mongoose.Mixed,
     afterReset: Boolean,
 });
 
