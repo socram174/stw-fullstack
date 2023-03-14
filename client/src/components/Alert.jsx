@@ -1,19 +1,34 @@
 import { useState, useEffect } from "react";
 import {Bolt} from '@mui/icons-material';
-import { Box } from "@mui/system";
+import { Box, Card,Typography} from "@mui/material";
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import Divider from '@mui/material/Divider';
+import CardContent from '@mui/material/CardContent';
 
 const AlertComp = ({ alert }) => {
 
   return (
-    <Box sx={{ border: "5px solid green",backgroundColor: "#8a817c", color: "black", borderRadius:"15px" }}>
-        {alert.zone === "N/A" ? (
-          <h1 style={{color: "#660708"}}>Zone: {alert.zone}</h1>
-        ) : (
-          <h1 style={{color: "#660708"}}>Zone: {alert.zone.name}</h1>
-        )}
-        <h3 style={{color: "#3c6e71"}}>vbucks: {alert.vbucks}</h3>
-        <h3>date: {alert.date}</h3>
-        <h3>Power Level: <Bolt style={{color: "yellow"}} />{alert.powerLevel}</h3>
+    <Box className="Alerta">
+      <Card
+            variant="outlined"
+            sx={{
+              borderRadius: '6px',
+              mb: '5px',
+              height: '5rem',
+            }}
+          >
+                <CardContent>
+      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+      {alert.zone.mission}
+      </Typography>
+      <Typography variant="h5" component="div">
+        {alert.vbucks}
+      </Typography>
+    </CardContent>
+          </Card>
     </Box>
   );
 }
