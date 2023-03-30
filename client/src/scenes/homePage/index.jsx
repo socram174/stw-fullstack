@@ -1,12 +1,12 @@
-import { Box, useMediaQuery,Typography,Card } from "@mui/material";
+import { Box, useMediaQuery, Typography, Card } from "@mui/material";
 import AlertComp from "../../components/Alert";
 import { useState, useEffect } from "react";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
-import Stack from '@mui/material/Stack';
+import Stack from "@mui/material/Stack";
+import CircularProgress from "@mui/material/CircularProgress";
 
-
-function HomePage(){
+function HomePage() {
   const [datos, setDatos] = useState([]);
   const [totalVbucks, setTotalVbucks] = useState(0);
   const current = new Date();
@@ -78,182 +78,227 @@ function HomePage(){
   }, [datos]);
 
   return (
-    <div style={{maxWidth:"1280px", margin:"auto"}}>
+    <div style={{ maxWidth: "1280px", margin: "auto" }}>
       {loading ? (
-        <Box sx={{display:"flex",height:"100vh",justifyContent:"center",alignItems:"center"}}>
-          <h1>Loading...</h1>
-        </Box>
-      ): (
-        noMissions ? (
-          <Box sx={{display:"flex",height:"100vh",justifyContent:"center",alignItems:"center"}}>
-            <Alert variant="outlined" severity="info">
-              <AlertTitle><strong>Info</strong></AlertTitle>
-              No vbucks missions for today.
-            </Alert>
-          </Box>
-        ) : (
-         isNonMobileScreens ? (
-          <Box
+        <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
           }}
         >
           <Box
             sx={{
-              border: '1px solid #2E4F4F',
-              p: '10px',
-              borderRadius: '10px',
-              backgroundColor: '#F8F8F8',
-              display: 'flex',
-              justifyContent: 'center',
-              maxWidth: '1000px',
-              gap: '10px',
+              border: "1px solid #2E4F4F",
+              p: "10px",
+              borderRadius: "10px",
+              backgroundColor: "#F8F8F8",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              maxWidth: "1000px",
+              width: "100%",
+              height: "20%",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        </Box>
+      ) : noMissions ? (
+        <Box
+          sx={{
+            display: "flex",
+            height: "100vh",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Alert variant="outlined" severity="info">
+            <AlertTitle>
+              <strong>Info</strong>
+            </AlertTitle>
+            No vbucks missions for today.
+          </Alert>
+        </Box>
+      ) : isNonMobileScreens ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+          }}
+        >
+          <Box
+            sx={{
+              border: "1px solid #2E4F4F",
+              p: "10px",
+              borderRadius: "10px",
+              backgroundColor: "#F8F8F8",
+              display: "flex",
+              justifyContent: "center",
+              maxWidth: "1000px",
+              gap: "10px",
             }}
           >
             <Box
               sx={{
-                width: '15rem',
-                border: '1px solid green',
-                p: '15px',
-                borderRadius: '8px',
+                width: "15rem",
+                border: "1px solid green",
+                p: "15px",
+                borderRadius: "8px",
               }}
             >
-              <Typography variant="h4" component="div" sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{ textAlign: "center" }}
+              >
                 Stonewood
               </Typography>
-              {stoneArray.map((dato) => <AlertComp alert={dato} />)}
+              {stoneArray.map((dato) => (
+                <AlertComp alert={dato} />
+              ))}
             </Box>
             <Box
               sx={{
-                width: '15rem',
-                border: '1px solid green',
-                p: '15px',
-                borderRadius: '8px',
+                width: "15rem",
+                border: "1px solid green",
+                p: "15px",
+                borderRadius: "8px",
               }}
             >
               <Typography variant="h4" component="div">
                 Plankerton
               </Typography>
-              {plankArray.map((dato) => <AlertComp alert={dato} />)}
-
+              {plankArray.map((dato) => (
+                <AlertComp alert={dato} />
+              ))}
             </Box>
             <Box
               sx={{
-                width: '15rem',
-                border: '1px solid green',
-                p: '15px',
-                borderRadius: '8px',
+                width: "15rem",
+                border: "1px solid green",
+                p: "15px",
+                borderRadius: "8px",
               }}
             >
               <Typography variant="h4" component="div">
                 Canny Valley
               </Typography>
-              {cannyArray.map((dato) => <AlertComp alert={dato} />)}
+              {cannyArray.map((dato) => (
+                <AlertComp alert={dato} />
+              ))}
             </Box>
             <Box
               sx={{
-                width: '15rem',
-                border: '1px solid green',
-                p: '15px',
-                borderRadius: '8px',
+                width: "15rem",
+                border: "1px solid green",
+                p: "15px",
+                borderRadius: "8px",
               }}
             >
               <Typography variant="h4" component="div">
                 Twine Peaks
               </Typography>
-              {twineArray.map((dato) => <AlertComp alert={dato} />)}
-
-
+              {twineArray.map((dato) => (
+                <AlertComp alert={dato} />
+              ))}
             </Box>
           </Box>
         </Box>
-         ):(
-          <Box
+      ) : (
+        <Box
           sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
           }}
         >
           <Box
             sx={{
-              border: '1px solid #2E4F4F',
-              p: '10px',
-              borderRadius: '10px',
-              backgroundColor: '#F8F8F8',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              maxWidth: '1000px',
-              gap: '10px',
+              border: "1px solid #2E4F4F",
+              p: "10px",
+              borderRadius: "10px",
+              backgroundColor: "#F8F8F8",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              maxWidth: "1000px",
+              gap: "10px",
             }}
           >
             <Box
               sx={{
-                width: '15rem',
-                border: '1px solid green',
-                p: '15px',
-                borderRadius: '8px',
+                width: "15rem",
+                border: "1px solid green",
+                p: "15px",
+                borderRadius: "8px",
               }}
             >
-              <Typography variant="h4" component="div" sx={{ textAlign: 'center' }}>
+              <Typography
+                variant="h4"
+                component="div"
+                sx={{ textAlign: "center" }}
+              >
                 Stonewood
               </Typography>
-              {stoneArray.map((dato) => <AlertComp alert={dato} />)}
+              {stoneArray.map((dato) => (
+                <AlertComp alert={dato} />
+              ))}
             </Box>
             <Box
               sx={{
-                width: '15rem',
-                border: '1px solid green',
-                p: '15px',
-                borderRadius: '8px',
+                width: "15rem",
+                border: "1px solid green",
+                p: "15px",
+                borderRadius: "8px",
               }}
             >
               <Typography variant="h4" component="div">
                 Plankerton
               </Typography>
-              {plankArray.map((dato) => <AlertComp alert={dato} />)}
-
+              {plankArray.map((dato) => (
+                <AlertComp alert={dato} />
+              ))}
             </Box>
             <Box
               sx={{
-                width: '15rem',
-                border: '1px solid green',
-                p: '15px',
-                borderRadius: '8px',
+                width: "15rem",
+                border: "1px solid green",
+                p: "15px",
+                borderRadius: "8px",
               }}
             >
               <Typography variant="h4" component="div">
                 Canny Valley
               </Typography>
-              {cannyArray.map((dato) => <AlertComp alert={dato} />)}
+              {cannyArray.map((dato) => (
+                <AlertComp alert={dato} />
+              ))}
             </Box>
             <Box
               sx={{
-                width: '15rem',
-                border: '1px solid green',
-                p: '15px',
-                borderRadius: '8px',
+                width: "15rem",
+                border: "1px solid green",
+                p: "15px",
+                borderRadius: "8px",
               }}
             >
               <Typography variant="h4" component="div">
                 Twine Peaks
               </Typography>
-              {twineArray.map((dato) => <AlertComp alert={dato} />)}
-
-
+              {twineArray.map((dato) => (
+                <AlertComp alert={dato} />
+              ))}
             </Box>
           </Box>
         </Box>
-         )
-        )
       )}
       <h6>V 0.1.0 - 2023</h6>
     </div>
   );
-};
+}
 export default HomePage;
