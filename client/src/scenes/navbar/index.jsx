@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 
 import Container from '@mui/material/Container';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
 
 
@@ -23,8 +23,8 @@ function NavBar() {
           <Typography
             variant="h6"
             noWrap
-            component="a"
-            href="/"
+            component={RouterLink}
+            to="/"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -35,7 +35,7 @@ function NavBar() {
               textDecoration: 'none',
             }}
           >
-            <img src='/Icon_VBucks.webp' width={"30px"} style={{marginRight:"5px"}}/> STW Alerts
+            <img src='/Icon_VBucks.webp' alt='vBucks logo representing the in game currency' width={"30px"} style={{marginRight:"5px"}}/> STW Alerts
           </Typography>
           
           <Typography           sx={{
@@ -64,7 +64,7 @@ function NavBar() {
               textDecoration: 'none',
             }}
           >
-            <img src='/Icon_VBucks.webp' width={"50px"}/>
+            <img src='/Icon_VBucks.webp' alt='vBucks logo representing the in game currency' width={"50px"}/>
           </Typography>
         </Toolbar>
       </Container>
