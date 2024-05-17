@@ -22,7 +22,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    getAlerts();
+    //getAlerts();
   }, []);
   return (
     <>
@@ -30,10 +30,15 @@ const Home = () => {
         id="initial"
         className="flex justify-center items-center h-full flex-col"
       >
-        <h1 className="font-bold sm:text-8xl text-7xl">Daily</h1>
-        <h1 className="font-bold sm:text-9xl text-8xl text-green-400">vbucks</h1>
-        <h1 className="font-bold sm:text-8xl text-7xl">alerts!</h1>
-        
+        <h1 className="font-bold sm:text-8xl text-7xl selection:text-white selection:bg-green-400">
+          Daily
+        </h1>
+        <h1 className="font-bold sm:text-9xl text-8xl text-green-400 selection:text-white selection:bg-green-400">
+          vbucks
+        </h1>
+        <h1 className="font-bold sm:text-8xl text-7xl selection:text-white selection:bg-green-400">
+          alerts!
+        </h1>
 
         <a href="#alerts">
           <svg
@@ -56,6 +61,7 @@ const Home = () => {
         id="alerts"
         className="h-full flex justify-center items-center flex-col"
       >
+        <h1 className="text-4xl font-bold">ALERTS</h1>
         {loading && (
           <>
             <svg
@@ -92,9 +98,29 @@ const Home = () => {
               />
             </svg>
 
-            <h3 className="text-red-400 font-bold text-xl">Could not fetch the alerts.</h3>
+            <h3 className="text-red-400 font-bold text-xl">
+              Could not fetch the alerts.
+            </h3>
           </div>
         )}
+      </section>
+      <section
+        id="contact-footer"
+        className="flex justify-center items-center h-full flex-col gap-4"
+      >
+        <div className="h-1/2 flex justify-center items-center w-[90%] bg-green-400 rounded-md">
+          <h1 className="text-4xl font-bold text-white">NOTIFICATIONS</h1>
+        </div>
+
+        <div className="h-1/2 flex justify-center items-center flex-col bg-[#242424] w-full">
+          <h1 className="text-4xl  text-white">
+            Made by{" "}
+            <span className="text-green-400 font-bold">Marcos Silva</span>
+          </h1>
+          <h3 className="text-4xl font-bold text-white">
+            {new Date().getFullYear()}
+          </h3>
+        </div>
       </section>
     </>
   );
