@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 const Navbar = () => {
   return (
     <>
@@ -5,10 +7,25 @@ const Navbar = () => {
         <nav>
           <ul className="flex gap-4 p-2 font-bold">
             <li>
-              <a href="/">Home</a>
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive ? "bg-green-500 text-white p-2 rounded-md" : "p-2 rounded-md"
+                }
+              >
+                Home
+              </NavLink>
             </li>
+            <h3 className="text-green-500">|</h3>
             <li>
-              <a href="/history">History</a>
+              <NavLink
+                to="/history"
+                className={({ isActive }) =>
+                  isActive ? "bg-green-500 text-white p-2 rounded-md" : "p-2 rounded-md"
+                }
+              >
+                History
+              </NavLink>
             </li>
           </ul>
         </nav>
