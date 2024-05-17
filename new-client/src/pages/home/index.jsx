@@ -105,7 +105,7 @@ const Home = () => {
         )}
       </section>
       <section
-        id="contact-footer"
+        id="notifications-footer"
         className="flex justify-center items-center h-full flex-col gap-4"
       >
         <div className="h-1/2 flex justify-center items-center w-[90%] bg-green-400 rounded-md">
