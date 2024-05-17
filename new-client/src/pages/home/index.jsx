@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import Notifications from "../../components/notifications";
+import Footer from "../../components/footer";
 
 const Home = () => {
   const [alerts, setAlerts] = useState([]);
@@ -108,19 +110,10 @@ const Home = () => {
         id="notifications-footer"
         className="flex justify-center items-center h-full flex-col gap-4"
       >
-        <div id="notifications" className="h-1/2 flex justify-center items-center w-[90%] bg-green-400 rounded-md">
-          <h1 className="text-4xl font-bold text-white">NOTIFICATIONS</h1>
-        </div>
+        <Notifications />
+        <Footer />
 
-        <div id="footer" className="h-1/2 flex justify-center items-center flex-col bg-[#242424] w-full">
-          <h1 className="text-4xl  text-white">
-            Made by{" "}
-            <span className="text-green-400 font-bold">Marcos Silva</span>
-          </h1>
-          <h3 className="text-4xl font-bold text-white">
-            {new Date().getFullYear()}
-          </h3>
-        </div>
+
       </section>
     </>
   );
