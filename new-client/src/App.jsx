@@ -3,6 +3,8 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import Home from "./pages/home";
 import History from "./pages/history";
 import Navbar from "./components/navbar";
+import Notifications from "./components/notifications";
+import Footer from "./components/footer";
 
 function App() {
   return (
@@ -13,6 +15,14 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/history" element={<History />} />
         </Routes>
+
+        <section
+          id="notifications-footer"
+          className="flex justify-center items-center h-full flex-col gap-4"
+        >
+          <Notifications />
+          <Footer />
+        </section>
       </BrowserRouter>
     </>
   );
