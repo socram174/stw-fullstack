@@ -106,15 +106,6 @@ const Home = () => {
           </div>
         )}
       </section>
-      <section
-        id="notifications-footer"
-        className="flex justify-center items-center h-full flex-col gap-4"
-      >
-        <Notifications />
-        <Footer />
-
-
-      </section>
     </>
   );
 };
