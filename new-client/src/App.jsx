@@ -7,8 +7,8 @@ import Navbar from "./components/navbar";
 function App() {
   return (
     <>
-      <Navbar />
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/history" element={<History />} />
