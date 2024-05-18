@@ -5,12 +5,14 @@ import History from "./pages/history";
 import Navbar from "./components/navbar";
 import Notifications from "./components/notifications";
 import Footer from "./components/footer";
+import ScrollToTop from "./components/scroll";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <Navbar />
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/history" element={<History />} />
