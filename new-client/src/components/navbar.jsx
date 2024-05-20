@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 const Navbar = () => {
   return (
     <>
-      <header className="fixed p-2 bg-white w-full rounded-md">
+      <header className="fixed p-2 bg-white w-full rounded-md h-[56px]">
         <nav>
           <ul className="flex gap-4 p-2 font-bold">
             <li>
