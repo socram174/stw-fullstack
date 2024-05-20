@@ -86,8 +86,19 @@ const Home = () => {
             </div>
           )}
 
-          {alerts.length > 0 && (
-            <div className="rounded-md w-[90%] h-[50vh] flex">
+          {alerts.length > 0 &&(
+            alerts[0].vbucks == 0 ? (
+              <div className="rounded-md w-[90%] h-[50vh] flex">
+              <div className="bg-[#242424] w-full h-full flex flex-col text-center p-4 justify-center">
+                <h3 className="text-white font-bold text-2xl">
+                  Total <span className="text-blue-400">vbucks</span> for today:
+                </h3>
+                <span className="text-red-400 font-bold text-5xl">0</span>
+              </div>
+            </div>
+            ): 
+            (
+              <div className="rounded-md w-[90%] h-[50vh] flex">
               <div className="bg-[#242424] w-1/2 h-full flex flex-col text-center p-4 justify-center">
                 <h3 className="text-white font-bold text-2xl">
                   Total <span className="text-blue-400">vbucks</span> for today:
@@ -105,6 +116,7 @@ const Home = () => {
                 </div>
               ))}
             </div>
+            )
           )}
         </section>
       </main>
