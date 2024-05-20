@@ -22,7 +22,6 @@ export function useTodayAlerts () {
   
     const getAlerts = async () => {
       try {
-        //console.log(import.meta.env.VITE_BASE_APP_URL);
         const response = await fetch(
           `${import.meta.env.VITE_BASE_APP_URL}/alerts/update`,
           {
@@ -34,10 +33,7 @@ export function useTodayAlerts () {
             },
           }
         );
-        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-        await sleep(3000);
         const data = await response.json();
-        console.log(data);
         setAlerts(data);
         setLoading(false);
       } catch (err) {
@@ -46,7 +42,6 @@ export function useTodayAlerts () {
         setError(true);
       }
     };
-
     useEffect(() => {
         getAlerts();
     }, []);
