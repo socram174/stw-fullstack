@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { useTodayAlerts } from "../../hooks/useTodayAlerts";
+import { Helmet } from "react-helmet";
 
 const Home = () => {
-
   const { alerts, loading, error } = useTodayAlerts();
 
   //bg-[#e1ebe4] posible color de fondo
 
   return (
     <>
+      <Helmet>
+        <title>STW Alerts</title>
+        <meta name="description" content="Daily vbucks alerts for the Save the World mode in Fortnite."/>
+      </Helmet>
       <main className="h-auto flex flex-col ">
         <section
           id="initial"
@@ -88,38 +92,40 @@ const Home = () => {
             </div>
           )}
 
-          {alerts.length > 0 &&(
-            alerts[0].vbucks == 0 ? (
+          {alerts.length > 0 &&
+            (alerts[0].vbucks == 0 ? (
               <div className="rounded-md w-[90%] h-[50vh] flex">
-              <div className="red-alert-background w-full h-full flex flex-col text-center p-4 justify-center rounded-md">
-                <h3 className="text-white font-bold text-2xl">
-                  Total <span className="text-blue-400">vbucks</span> for today:
-                </h3>
-                <span className="text-red-400 font-bold text-5xl">0</span>
-              </div>
-            </div>
-            ): 
-            (
-              <div className="rounded-md w-[90%] h-[50vh] flex">
-              <div className="green-alert-background w-1/2 h-full flex flex-col text-center p-4 justify-center">
-                <h3 className="text-white font-bold text-2xl">
-                  Total <span className="text-blue-400">vbucks</span> for today:
-                </h3>
-                <span className="text-green-400 font-bold text-5xl">120</span>
-              </div>
-              {alerts.map((alert) => (
-                <div
-                  key={alert._id}
-                  id="alert-card"
-                  className="w-[70%] p-4 flex flex-col items-center gap-4"
-                >
-                  <h3 className="font-bold text-xl">{alert.zone["mission"]}</h3>
-                  <p className="text-red-400 font-bold">{alert.powerLevel}</p>
+                <div className="red-alert-background w-full h-full flex flex-col text-center p-4 justify-center rounded-md">
+                  <h3 className="text-white font-bold text-2xl">
+                    Total <span className="text-blue-400">vbucks</span> for
+                    today:
+                  </h3>
+                  <span className="text-red-400 font-bold text-5xl">0</span>
                 </div>
-              ))}
-            </div>
-            )
-          )}
+              </div>
+            ) : (
+              <div className="rounded-md w-[90%] h-[50vh] flex">
+                <div className="green-alert-background w-1/2 h-full flex flex-col text-center p-4 justify-center">
+                  <h3 className="text-white font-bold text-2xl">
+                    Total <span className="text-blue-400">vbucks</span> for
+                    today:
+                  </h3>
+                  <span className="text-green-400 font-bold text-5xl">120</span>
+                </div>
+                {alerts.map((alert) => (
+                  <div
+                    key={alert._id}
+                    id="alert-card"
+                    className="w-[70%] p-4 flex flex-col items-center gap-4"
+                  >
+                    <h3 className="font-bold text-xl">
+                      {alert.zone["mission"]}
+                    </h3>
+                    <p className="text-red-400 font-bold">{alert.powerLevel}</p>
+                  </div>
+                ))}
+              </div>
+            ))}
         </section>
       </main>
     </>
