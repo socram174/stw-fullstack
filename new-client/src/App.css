@@ -1,0 +1,9 @@
+.green-alert-background {
+    background: rgb(47,115,38);
+background: linear-gradient(180deg, rgba(47,115,38,1) 0%, rgba(0,0,0,1) 100%);
+}
+
+.red-alert-background {
+    background: rgb(115,38,38);
+background: linear-gradient(180deg, rgba(115,38,38,1) 0%, rgba(0,0,0,1) 100%);
+}

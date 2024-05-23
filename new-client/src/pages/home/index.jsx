@@ -5,9 +5,11 @@ const Home = () => {
 
   const { alerts, loading, error } = useTodayAlerts();
 
+  //bg-[#e1ebe4] posible color de fondo
+
   return (
     <>
-      <main className="h-auto flex flex-col">
+      <main className="h-auto flex flex-col ">
         <section
           id="initial"
           className="flex justify-center items-center min-h-screen flex-col mt-14"
@@ -89,7 +91,7 @@ const Home = () => {
           {alerts.length > 0 &&(
             alerts[0].vbucks == 0 ? (
               <div className="rounded-md w-[90%] h-[50vh] flex">
-              <div className="bg-[#242424] w-full h-full flex flex-col text-center p-4 justify-center">
+              <div className="red-alert-background w-full h-full flex flex-col text-center p-4 justify-center rounded-md">
                 <h3 className="text-white font-bold text-2xl">
                   Total <span className="text-blue-400">vbucks</span> for today:
                 </h3>
@@ -99,7 +101,7 @@ const Home = () => {
             ): 
             (
               <div className="rounded-md w-[90%] h-[50vh] flex">
-              <div className="bg-[#242424] w-1/2 h-full flex flex-col text-center p-4 justify-center">
+              <div className="green-alert-background w-1/2 h-full flex flex-col text-center p-4 justify-center">
                 <h3 className="text-white font-bold text-2xl">
                   Total <span className="text-blue-400">vbucks</span> for today:
                 </h3>
@@ -109,7 +111,7 @@ const Home = () => {
                 <div
                   key={alert._id}
                   id="alert-card"
-                  className="w-[70%] rounded-md p-4 flex flex-col items-center gap-4 bg-gray-300"
+                  className="w-[70%] p-4 flex flex-col items-center gap-4"
                 >
                   <h3 className="font-bold text-xl">{alert.zone["mission"]}</h3>
                   <p className="text-red-400 font-bold">{alert.powerLevel}</p>
