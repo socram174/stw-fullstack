@@ -4,6 +4,17 @@ import { Helmet } from "react-helmet";
 
 const Home = () => {
   const { alerts, loading, error } = useTodayAlerts();
+  const [totalVbucks, setTotalVbucks] = useState(0);
+
+  useEffect(() => {
+    if (alerts.length > 0) {
+      let total = 0;
+      alerts.forEach((alert) => {
+        total += alert.vbucks;
+      });
+      setTotalVbucks(total);
+    }
+  },[]);
 
   //bg-[#e1ebe4] posible color de fondo
 
@@ -104,13 +115,13 @@ const Home = () => {
                 </div>
               </div>
             ) : (
-              <div className="rounded-md w-[90%] h-[50vh] flex">
-                <div className="green-alert-background w-1/2 h-full flex flex-col text-center p-4 justify-center">
+              <div className="rounded-md w-[90%] h-[50vh] flex flex-col items-center sm:flex-row">
+                <div className="green-alert-background w-full sm:w-1/2 sm:h-full flex flex-col text-center p-4 justify-center">
                   <h3 className="text-white font-bold text-2xl">
                     Total <span className="text-blue-400">vbucks</span> for
                     today:
                   </h3>
-                  <span className="text-green-400 font-bold text-5xl">120</span>
+                  <span className="text-green-400 font-bold text-5xl">{totalVbucks}</span>
                 </div>
                 {alerts.map((alert) => (
                   <div
