@@ -3,18 +3,8 @@ import { useTodayAlerts } from "../../hooks/useTodayAlerts";
 import { Helmet } from "react-helmet";
 
 const Home = () => {
-  const { alerts, loading, error } = useTodayAlerts();
-  const [totalVbucks, setTotalVbucks] = useState(0);
+  const { alerts, loading, error, totalVbucks } = useTodayAlerts();
 
-  useEffect(() => {
-    if (alerts.length > 0) {
-      let total = 0;
-      alerts.forEach((alert) => {
-        total += alert.vbucks;
-      });
-      setTotalVbucks(total);
-    }
-  },[]);
 
   //bg-[#e1ebe4] posible color de fondo
 
@@ -132,7 +122,8 @@ const Home = () => {
                     <h3 className="font-bold text-xl">
                       {alert.zone["mission"]}
                     </h3>
-                    <p className="text-red-400 font-bold">{alert.powerLevel}</p>
+                    <p className="text-red-400 font-bold">Power Level: {alert.powerLevel}</p>
+                    <p className="text-blue-400 font-bold">vbucks: {alert.vbucks}</p>
                   </div>
                 ))}
               </div>

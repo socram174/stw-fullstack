@@ -4,6 +4,7 @@ export function useTodayAlerts () {
     const [alerts, setAlerts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    const [totalVbucks, setTotalVbucks] = useState(0);
   
     function format(inputDate) {
       //Para formatear la fecha a MM/DD/YYYY para que coincida con la base de datos y poder hacer la consulta de las alerts de hoy
@@ -35,7 +36,7 @@ export function useTodayAlerts () {
         );
         const data = await response.json();
         setAlerts(data);
-        setLoading(false);
+        return data;
       } catch (err) {
         console.log("Error, could not fetch alerts.");
         setLoading(false);
@@ -43,9 +44,18 @@ export function useTodayAlerts () {
       }
     };
     useEffect(() => {
-        getAlerts();
+        getAlerts().then((data) => {
+          const initialValue = 0;
+          const total = data.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.vbucks,
+            initialValue,
+          );
+          setTotalVbucks(total);
+          setLoading(false);
+          
+        });
     }, []);
 
-    return { alerts, loading, error };
+    return { alerts, loading, error, totalVbucks };
 }
 
