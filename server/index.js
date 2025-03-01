@@ -8,6 +8,7 @@ import morgan from 'morgan';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import alertRoutes from './routes/alerts.js';
+import mailRoutes from './routes/mail.js';
 
 /* CONFIGURATIONS*/
 const __filename = fileURLToPath(import.meta.url); 
@@ -25,6 +26,7 @@ app.use(bodyParser.urlencoded({limit: "30mb",extended:true}));
 
 /* ROUTES */
 app.use('/alerts',alertRoutes);
+app.use('/mail',mailRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;
