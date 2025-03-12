@@ -3,7 +3,7 @@ import { addSubscriber, notifySubscribers, getSubscribers } from '../controllers
 
 const router = express.Router();
 
-router.get('/', addSubscriber);
+router.post('/subscribers', addSubscriber);
 router.get('/notify', notifySubscribers);
 router.get('/subscribers', getSubscribers);
 

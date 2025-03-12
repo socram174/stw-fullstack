@@ -1,9 +1,34 @@
-//import fetch from 'node-fetch';
+import fetch from 'node-fetch';
 import fs from 'fs'
+import FormData from 'form-data';
 
 export const addSubscriber = async (req, res) => {
+    const { address, name, subscribed } = req.body;
+    console.log(req.body)
+    const form = new FormData();
+    form.append('address',address);
+    form.append('name',name);
+    form.append('subscribed',subscribed);
+    form.append('upsert','true');
+
+
+    const listAddress = process.env.MAILGUN_LIST_ADDRESS;
+    const resp = await fetch(
+        `https://api.mailgun.net/v3/lists/${listAddress}/members`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: 'Basic ' + Buffer.from(`<username>:${process.env.MAILGUN_API_KEY}`).toString('base64')
+          },
+          body: form
+        }
+      );
+    
+      const data = await resp.json();
+      console.log(data);
+    
     try {
-        res.status(200).json({message: "Add new subscriber"});
+        res.status(200).json(data);
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
