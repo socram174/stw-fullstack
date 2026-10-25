@@ -1,5 +1,5 @@
-// The collector still writes legacy dates and nested zone fields. Normalize at
-// the API boundary without changing its database contract.
+// Accept legacy dates during migration/rolling deployment. New collector writes
+// ISO calendar dates; nested zone fields remain compatible with old clients.
 export function parseAlertDate(value) {
     if (typeof value !== 'string') throw new Error('Invalid stored alert date.');
     const legacy = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/.exec(value);

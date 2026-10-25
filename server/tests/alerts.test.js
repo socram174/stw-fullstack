@@ -28,7 +28,10 @@ async function withApi(repository, run) {
     finally { await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve())); }
 }
 
-const repository = { findAlerts: async () => records, findLogs: async () => [{ lastUpdated: '01/02/2026' }] };
+const repository = {
+    getHistory: async (filters) => buildHistory(alerts, filters),
+    getLatest: async () => buildLatest(alerts, [{ lastUpdated: '01/02/2026' }]),
+};
 
 test('legacy and ISO calendar dates normalize without timezone shifts', () => {
     for (const [input, expected] of [['11/27/22', '2022-11-27'], ['1/1/2026', '2026-01-01'], ['2024-02-29', '2024-02-29']]) {
@@ -132,7 +135,7 @@ test('latest keeps rotation metadata with no missions and supports an empty data
 
 test('HTTP endpoints expose the versioned contract and reject invalid requests before database reads', async () => {
     let reads = 0;
-    await withApi({ ...repository, findAlerts: async () => { reads++; return records; } }, async (request) => {
+    await withApi({ ...repository, getHistory: async (filters) => { reads++; return repository.getHistory(filters); } }, async (request) => {
         const first = await request('?limit=1');
         assert.equal(first.status, 200);
         assert.equal(first.body.data.length, 1);
@@ -154,9 +157,9 @@ test('HTTP endpoints expose the versioned contract and reject invalid requests b
 
 test('database and log failures return JSON 500 without leaking internal details', async (t) => {
     t.mock.method(console, 'error', () => {});
-    for (const failed of ['findAlerts', 'findLogs']) {
+    for (const failed of ['getHistory', 'getLatest']) {
         await withApi({ ...repository, [failed]: async () => { throw new Error('private connection details'); } }, async (request) => {
-            const result = await request('/latest');
+            const result = await request(failed === 'getLatest' ? '/latest' : '');
             assert.equal(result.status, 500);
             assert.equal(result.body.error.code, 'INTERNAL_ERROR');
             assert.doesNotMatch(JSON.stringify(result.body), /private/);

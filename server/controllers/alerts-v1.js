@@ -1,4 +1,3 @@
-import { buildHistory, buildLatest, normalizeAlerts } from '../services/alert-data.js';
 import { parseAlertQuery } from '../validation/alert-query.js';
 
 export function createAlertControllers(repository) {
@@ -6,14 +5,12 @@ export function createAlertControllers(repository) {
         history: async (req, res, next) => {
             try {
                 const filters = parseAlertQuery(req.query);
-                const alerts = normalizeAlerts(await repository.findAlerts());
-                res.json(buildHistory(alerts, filters));
+                res.json(await repository.getHistory(filters));
             } catch (error) { next(error); }
         },
         latest: async (req, res, next) => {
             try {
-                const [records, logs] = await Promise.all([repository.findAlerts(), repository.findLogs()]);
-                res.json(buildLatest(normalizeAlerts(records), logs));
+                res.json(await repository.getLatest());
             } catch (error) { next(error); }
         },
     };

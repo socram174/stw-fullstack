@@ -1,8 +1,8 @@
 # Alerts API
 
 Run `npm install` and `npm start` from `server/`. The existing `MONGO_URL`
-and `PORT` environment variables still apply. Run `npm test` for unit and HTTP
-contract tests; they use an in-memory repository and do not connect to MongoDB.
+and `PORT` environment variables still apply. Run `npm test` for unit, migration
+and HTTP contract tests; these do not connect to MongoDB.
 
 ## Version 1
 
@@ -82,18 +82,53 @@ details. Unknown versioned alert routes return `404`. Error bodies use:
 - `controllers/alerts-v1.js`: request orchestration.
 - `validation/alert-query.js`: query validation.
 - `services/alert-data.js`: normalization, filtering, summaries and pagination.
+- `services/alert-pipeline.js`: MongoDB projections, filters and aggregate summaries.
 - `repositories/alerts.js`: read-only database access.
 
 `GET /alerts` and `POST /alerts/update` remain available with their original
 array response for older clients. New clients should use `/api/v1/alerts`.
 Email routes and controllers are unchanged.
 
-The external collector and existing MongoDB documents are unchanged. Because
-stored dates mix multiple string formats, the repository currently reads the
-archive and the service filters/paginates it in memory. Pagination reduces the
-client payload; it does not yet reduce database reads. Moving filtering to
-indexed MongoDB queries requires coordinating an ISO date migration with the
-collector. This boundary keeps that future change out of route and UI code.
+Dates are stored as ISO calendar strings, using the collector's existing
+`America/Santiago` day without shifting historical dates. Date range filtering,
+sorting, pagination, totals and daily rewards run in MongoDB. The repository
+returns only the requested page, aggregates and zone options. The compound
+`alerts_date_reward_id` index supports date ranges and recent-date ordering.
+
+During rolling deployments, if legacy alert dates are detected, the repository
+temporarily uses the previous normalization/filtering path. This keeps the API
+usable if an older deployed collector writes another legacy date. Publish the
+updated collector in the separate `STWalerts` repository to finish the transition.
+
+## Date migration
+
+```sh
+# Read-only simulation; validates all dates and reports affected documents.
+npm run migrate:dates
+
+# Creates backups, migrates dates transactionally and creates the date index.
+npm run migrate:dates -- --apply
+
+# Read-only integration checks against MongoDB, including index selection.
+node scripts/verify-alert-queries.js
+```
+
+The migration reads `server/.env` and requires MongoDB transactions (a replica
+set or sharded cluster, including Atlas). Both `alerts.date` and
+`logs.lastUpdated` are converted in the same transaction. Each update guards the
+original date and ID; verification checks every other field, document count and
+daily reward total before commit. Invalid dates or mismatches abort the entire
+transaction. Running it again leaves ISO dates unchanged.
+
+Before updates, complete canonical Extended JSON backups of `alerts` and `logs`
+are written in the project root, preserving BSON types and IDs. Backup files are
+read back and verified; their paths and SHA-256 hashes are printed in the report.
+They are local backup artifacts and should be kept out of application commits.
+
+`node scripts/verify-alert-queries.js --preflight` exercises the MongoDB pipelines
+before migration using normalized copies of the real records plus accent and
+zero-reward fixtures. It performs no writes. Default verification compares the
+actual repository with the original full-archive results after migration.
 
 Deploy the backend before the new frontend. The legacy routes let the previous
 frontend continue working during the transition. Restart an already running
