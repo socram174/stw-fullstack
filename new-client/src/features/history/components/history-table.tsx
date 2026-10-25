@@ -30,19 +30,19 @@ export function HistoryTable({
     <div className="overflow-hidden rounded-xl border bg-card">
       <Table>
         <TableCaption className="sr-only">
-          Historial de alertas. Página {page} de {totalPages}. Recompensas y
-          niveles por misión.
+          Alert history. Page {page} of {totalPages}. Rewards and power levels
+          for each mission.
         </TableCaption>
         <TableHeader className="bg-muted/40">
           <TableRow>
             <TableHead scope="col" className="pl-5">
-              Fecha
+              Date
             </TableHead>
-            <TableHead scope="col">Misión</TableHead>
-            <TableHead scope="col">Zona</TableHead>
-            <TableHead scope="col">Nivel</TableHead>
+            <TableHead scope="col">Mission</TableHead>
+            <TableHead scope="col">Zone</TableHead>
+            <TableHead scope="col">Level</TableHead>
             <TableHead scope="col" className="pr-5 text-right">
-              Pavos
+              V-Bucks
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -63,7 +63,7 @@ export function HistoryTable({
                 {alert.afterReset && (
                   <span className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                     <RotateCcw className="size-3" aria-hidden="true" />
-                    Después del reinicio
+                    After reset
                   </span>
                 )}
               </TableCell>
@@ -90,17 +90,18 @@ export function HistoryTable({
       <div className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-4">
         <p className="text-xs text-muted-foreground">
           {formatNumber(start + 1)}–
-          {formatNumber(Math.min(start + HISTORY_PAGE_SIZE, alerts.length))} de{" "}
-          {formatNumber(alerts.length)} registros
+          {formatNumber(Math.min(start + HISTORY_PAGE_SIZE, alerts.length))} of{" "}
+          {formatNumber(alerts.length)}{" "}
+          {alerts.length === 1 ? "record" : "records"}
         </p>
         <nav
-          aria-label="Paginación del historial"
+          aria-label="History pagination"
           className="flex items-center gap-2"
         >
           <Button
             variant="outline"
             size="icon-sm"
-            aria-label="Página anterior"
+            aria-label="Previous page"
             disabled={page === 1}
             onClick={() => onPageChange(page - 1)}
           >
@@ -115,7 +116,7 @@ export function HistoryTable({
           <Button
             variant="outline"
             size="icon-sm"
-            aria-label="Página siguiente"
+            aria-label="Next page"
             disabled={page === totalPages}
             onClick={() => onPageChange(page + 1)}
           >

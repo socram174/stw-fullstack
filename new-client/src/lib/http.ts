@@ -14,6 +14,6 @@ export async function apiRequest(
     signal,
     headers: { Accept: "application/json", ...options.headers },
   })
-  if (!response.ok) throw new Error(`La consulta falló (${response.status}).`)
+  if (!response.ok) throw new Error(`Request failed (${response.status}).`)
   return response.json()
 }

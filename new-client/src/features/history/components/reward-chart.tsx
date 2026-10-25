@@ -19,16 +19,17 @@ export function RewardChart({ days }: { days: DailyReward[] }) {
     >
       <div className="mb-7">
         <h2 id="chart-heading" className="font-semibold tracking-tight">
-          Los pavos, día a día
+          Daily V-Bucks
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
-          Últimos {visibleDays.length} días registrados de tu selección.
+          Last {visibleDays.length} recorded{" "}
+          {visibleDays.length === 1 ? "day" : "days"} in your selection.
         </p>
       </div>
       <div
         className="h-56 w-full min-w-0"
         role="img"
-        aria-label={`Gráfico de recompensas: ${visibleDays.map((day) => `${formatDate(day.date)}: ${day.vbucks} pavos`).join("; ")}`}
+        aria-label={`Rewards chart: ${visibleDays.map((day) => `${formatDate(day.date)}: ${day.vbucks} V-Bucks`).join("; ")}`}
       >
         <ResponsiveContainer
           width="100%"
@@ -74,8 +75,8 @@ export function RewardChart({ days }: { days: DailyReward[] }) {
               }}
               labelFormatter={(date) => formatDate(String(date))}
               formatter={(value) => [
-                `${formatNumber(Number(value))} pavos`,
-                "Recompensa",
+                `${formatNumber(Number(value))} V-Bucks`,
+                "Reward",
               ]}
             />
             <Bar
@@ -83,7 +84,7 @@ export function RewardChart({ days }: { days: DailyReward[] }) {
               fill="var(--primary)"
               radius={[4, 4, 0, 0]}
               maxBarSize={36}
-              isAnimationActive={false}
+              isAnimationActive="auto"
             />
           </BarChart>
         </ResponsiveContainer>

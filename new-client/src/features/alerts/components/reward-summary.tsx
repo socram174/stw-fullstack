@@ -17,14 +17,14 @@ export function RewardSummary({
 }) {
   return (
     <dl
-      aria-label="Resumen de la rotación"
+      aria-label="Rotation summary"
       className="grid grid-cols-2 overflow-hidden rounded-lg border bg-card sm:grid-cols-4"
     >
       {[
-        { label: "Pavos disponibles", value: total, unit: "pavos" },
-        { label: "Misiones", value: missionCount },
-        { label: "Zonas", value: zoneCount },
-        { label: "Nivel mínimo", value: minimumPower, unit: "PL" },
+        { label: "Available V-Bucks", value: total, unit: "V-Bucks" },
+        { label: "Missions", value: missionCount },
+        { label: "Zones", value: zoneCount },
+        { label: "Min. power level", value: minimumPower, unit: "PL" },
       ].map(({ label, value, unit }, index) => (
         <div
           key={label}

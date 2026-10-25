@@ -61,7 +61,7 @@ export function HistoryFilters({
 
   return (
     <form
-      aria-label="Filtros del historial"
+      aria-label="History filters"
       onSubmit={submit}
       className="space-y-4 rounded-xl border bg-card p-5"
     >
@@ -78,7 +78,7 @@ export function HistoryFilters({
             htmlFor="history-from"
             className="mb-1.5 block text-xs text-muted-foreground"
           >
-            Desde
+            From
           </label>
           <Input
             id="history-from"
@@ -99,7 +99,7 @@ export function HistoryFilters({
             htmlFor="history-to"
             className="mb-1.5 block text-xs text-muted-foreground"
           >
-            Hasta
+            To
           </label>
           <Input
             id="history-to"
@@ -119,7 +119,7 @@ export function HistoryFilters({
           className="col-span-2 sm:col-auto"
         >
           <Search className="size-4" aria-hidden="true" />
-          Aplicar filtros
+          Apply filters
         </Button>
         {hasFilters && (
           <Button
@@ -133,7 +133,7 @@ export function HistoryFilters({
             }}
           >
             <X className="size-3.5" aria-hidden="true" />
-            Limpiar filtros
+            Clear filters
           </Button>
         )}
         <p
@@ -141,15 +141,15 @@ export function HistoryFilters({
           role="status"
         >
           {!disabled
-            ? `${formatNumber(resultCount)} registros en la selección`
+            ? `${formatNumber(resultCount)} ${resultCount === 1 ? "record" : "records"} in this selection`
             : loading
-              ? "Consultando registros…"
-              : "Registros no disponibles"}
+              ? "Loading records…"
+              : "Records unavailable"}
         </p>
       </div>
       {invalidRange && (
         <p role="alert" className="text-sm text-destructive">
-          La fecha de inicio debe ser anterior o igual a la fecha de término.
+          The start date must be on or before the end date.
         </p>
       )}
     </form>

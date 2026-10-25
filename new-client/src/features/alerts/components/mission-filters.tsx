@@ -24,8 +24,8 @@ export function MissionFilters({
           aria-hidden="true"
         />
         <Input
-          aria-label="Buscar misiones"
-          placeholder="Buscar misión, zona o nivel…"
+          aria-label="Search missions"
+          placeholder="Search mission, zone or level…"
           value={value.search}
           disabled={disabled}
           onChange={(event) =>
@@ -36,13 +36,13 @@ export function MissionFilters({
       </div>
       <div className="grid grid-cols-2 gap-3 sm:flex">
         <NativeSelect
-          aria-label="Filtrar por zona"
+          aria-label="Filter by zone"
           className="w-full bg-card sm:w-44 [&_select]:text-xs sm:[&_select]:text-sm"
           value={value.zone}
           disabled={disabled}
           onChange={(event) => onChange({ ...value, zone: event.target.value })}
         >
-          <NativeSelectOption value="">Todas las zonas</NativeSelectOption>
+          <NativeSelectOption value="">All zones</NativeSelectOption>
           {zones.map((zone) => (
             <NativeSelectOption key={zone} value={zone}>
               {zone}
@@ -55,7 +55,7 @@ export function MissionFilters({
             aria-hidden="true"
           />
           <NativeSelect
-            aria-label="Ordenar misiones"
+            aria-label="Sort missions"
             className="w-full bg-card [&_select]:text-xs sm:[&_select]:pl-9 sm:[&_select]:text-sm"
             value={value.sort}
             disabled={disabled}
@@ -65,11 +65,11 @@ export function MissionFilters({
           >
             {history && (
               <NativeSelectOption value="recent">
-                Más recientes
+                Most recent
               </NativeSelectOption>
             )}
-            <NativeSelectOption value="power">Menor nivel</NativeSelectOption>
-            <NativeSelectOption value="reward">Más pavos</NativeSelectOption>
+            <NativeSelectOption value="power">Lowest level</NativeSelectOption>
+            <NativeSelectOption value="reward">Most V-Bucks</NativeSelectOption>
           </NativeSelect>
         </div>
       </div>

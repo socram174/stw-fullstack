@@ -57,8 +57,8 @@ test("legacy calendar dates cross years without timezone conversion", () => {
 test("zero reward placeholders preserve their day without creating a mission", () => {
   const alerts = normalizeAlerts(payload)
   const zero = alerts.find((alert) => alert.id === "zero")
-  assert.equal(zero.mission, "Sin misiones con pavos")
-  assert.equal(zero.zone, "Sin zona")
+  assert.equal(zero.mission, "No V-Buck missions")
+  assert.equal(zero.zone, "Unknown zone")
   assert.deepEqual(getAlertStats(alerts), {
     totalVbucks: 105,
     missions: 3,

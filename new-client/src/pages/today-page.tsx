@@ -42,25 +42,25 @@ export default function TodayPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <title>Alertas de pavos · STW Alerts</title>
+      <title>V-Buck alerts · STW Alerts</title>
       <meta
         name="description"
-        content="Encuentra misiones con pavos en Fortnite Save the World. Consulta recompensas, zonas y niveles de la última rotación disponible."
+        content="Find V-Buck missions in Fortnite Save the World. Check rewards, zones and power levels for the latest recorded rotation."
       />
       <div className="flex items-start justify-between gap-3 sm:items-center">
         <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight">
-            Alertas de pavos
+            V-Buck alerts
           </h1>
           <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
             <CalendarDays className="size-3.5 shrink-0" aria-hidden="true" />
             {latestDate ? (
               <span>
-                Rotación del{" "}
+                Rotation for{" "}
                 <time dateTime={latestDate}>{formatDate(latestDate)}</time>
               </span>
             ) : (
-              "Última rotación registrada"
+              "Latest recorded rotation"
             )}
           </p>
         </div>
@@ -68,8 +68,8 @@ export default function TodayPage() {
           variant="outline"
           size="sm"
           className="size-9 shrink-0 p-0 sm:h-8 sm:w-auto sm:px-2.5"
-          aria-label="Actualizar alertas"
-          title="Actualizar alertas"
+          aria-label="Refresh alerts"
+          title="Refresh alerts"
           onClick={refetch}
           disabled={loading}
         >
@@ -77,7 +77,7 @@ export default function TodayPage() {
             className={loading ? "size-3.5 animate-spin" : "size-3.5"}
             aria-hidden="true"
           />
-          <span className="hidden sm:inline">Actualizar</span>
+          <span className="hidden sm:inline">Refresh</span>
         </Button>
       </div>
 
@@ -96,7 +96,7 @@ export default function TodayPage() {
               id="missions-heading"
               className="text-base font-semibold tracking-tight"
             >
-              Misiones disponibles
+              Available missions
             </h2>
             {ready && (
               <span className="flex size-6 items-center justify-center rounded-md border bg-card text-xs font-medium tabular-nums">
@@ -108,7 +108,7 @@ export default function TodayPage() {
             to="/history"
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
-            Ver historial
+            View history
             <ArrowRight className="size-3.5" aria-hidden="true" />
           </Link>
         </div>
@@ -123,12 +123,12 @@ export default function TodayPage() {
         {status === "error" && (
           <FeedbackState
             error
-            title="No pudimos cargar las alertas"
-            description="La información no está disponible en este momento. Intenta nuevamente en unos instantes."
+            title="Unable to load alerts"
+            description="Alerts are temporarily unavailable. Try again in a moment."
           >
             <Button variant="outline" onClick={refetch}>
               <RefreshCw className="size-4" aria-hidden="true" />
-              Volver a intentar
+              Try again
             </Button>
           </FeedbackState>
         )}
@@ -136,41 +136,42 @@ export default function TodayPage() {
           <FeedbackState
             title={
               data.length
-                ? "Sin misiones con pavos en esta rotación"
-                : "Todavía no hay alertas disponibles"
+                ? "No V-Buck missions in this rotation"
+                : "No alerts available yet"
             }
             description={
               data.length
-                ? "No se registraron misiones con pavos en esta rotación. Puedes explorar las recompensas de días anteriores en el historial."
-                : "Cuando haya una rotación registrada, encontrarás aquí sus misiones y recompensas."
+                ? "No V-Buck missions were recorded for this rotation. Explore rewards from previous days in the history."
+                : "Missions and rewards will appear here once a rotation has been recorded."
             }
           >
             <Link
               className={buttonVariants({ variant: "outline" })}
               to="/history"
             >
-              Explorar historial
+              Explore history
               <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </FeedbackState>
         )}
         {ready && missions.length > 0 && !filtered.length && (
           <FeedbackState
-            title="No encontramos misiones"
-            description="Prueba con otra búsqueda o selecciona una zona diferente."
+            title="No missions found"
+            description="Try a different search or select another zone."
           >
             <Button
               variant="outline"
               onClick={() => setFilters(initialFilters)}
             >
-              Limpiar filtros
+              Clear filters
             </Button>
           </FeedbackState>
         )}
         {ready && filtered.length > 0 && (
           <>
             <p className="sr-only" role="status">
-              {filtered.length} misiones encontradas
+              {filtered.length} {filtered.length === 1 ? "mission" : "missions"}{" "}
+              found
             </p>
             <MissionList alerts={filtered} />
           </>

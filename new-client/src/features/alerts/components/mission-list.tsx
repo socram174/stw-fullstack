@@ -23,7 +23,7 @@ function MissionRow({ alert }: { alert: MissionAlert }) {
             {alert.afterReset && (
               <span className="inline-flex items-center gap-1">
                 <RotateCcw className="size-3" aria-hidden="true" />
-                Después del reinicio
+                After reset
               </span>
             )}
           </div>
@@ -33,7 +33,7 @@ function MissionRow({ alert }: { alert: MissionAlert }) {
         <ZoneBadge zone={alert.zone} />
         <span
           className="inline-flex items-center gap-1 text-xs text-muted-foreground md:hidden"
-          aria-label={`Nivel de poder: ${alert.powerLevel || "desconocido"}`}
+          aria-label={`Power level: ${alert.powerLevel || "unknown"}`}
         >
           <Zap className="size-3" aria-hidden="true" />
           {alert.powerLevel || "—"} PL
@@ -41,7 +41,7 @@ function MissionRow({ alert }: { alert: MissionAlert }) {
       </div>
       <div
         className="hidden text-sm text-muted-foreground tabular-nums md:block"
-        aria-label={`Nivel de poder: ${alert.powerLevel || "desconocido"}`}
+        aria-label={`Power level: ${alert.powerLevel || "unknown"}`}
       >
         {alert.powerLevel || "—"}
         <span className="ml-1 text-xs">PL</span>
@@ -50,7 +50,7 @@ function MissionRow({ alert }: { alert: MissionAlert }) {
         <p className="text-xl font-semibold tracking-tight text-primary tabular-nums">
           +{formatNumber(alert.vbucks)}
         </p>
-        <p className="mt-0.5 text-xs text-muted-foreground">pavos</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">V-Bucks</p>
       </div>
     </li>
   )
@@ -75,14 +75,14 @@ export function MissionList({
           desktopColumns
         )}
       >
-        <span>Misión</span>
-        <span>Zona</span>
-        <span>Nivel</span>
-        <span className="text-right">Recompensa</span>
+        <span>Mission</span>
+        <span>Zone</span>
+        <span>Level</span>
+        <span className="text-right">Reward</span>
       </div>
       {loading ? (
-        <div role="status" aria-label="Cargando misiones">
-          <span className="sr-only">Cargando misiones…</span>
+        <div role="status" aria-label="Loading missions">
+          <span className="sr-only">Loading missions…</span>
           <div className="divide-y" aria-hidden="true">
             {Array.from({ length: 3 }, (_, index) => (
               <div
@@ -99,7 +99,7 @@ export function MissionList({
           </div>
         </div>
       ) : (
-        <ul aria-label="Misiones con pavos" className="divide-y">
+        <ul aria-label="V-Buck missions" className="divide-y">
           {alerts.map((alert) => (
             <MissionRow key={alert.id} alert={alert} />
           ))}

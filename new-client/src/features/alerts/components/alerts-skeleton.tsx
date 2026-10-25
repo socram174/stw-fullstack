@@ -2,8 +2,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export function AlertsSkeleton() {
   return (
-    <div role="status" aria-label="Cargando alertas">
-      <span className="sr-only">Cargando alertas…</span>
+    <div role="status" aria-label="Loading alerts">
+      <span className="sr-only">Loading alerts…</span>
       <div
         aria-hidden="true"
         className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"

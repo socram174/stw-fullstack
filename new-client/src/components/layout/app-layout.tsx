@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils"
 import { ThemeToggle } from "./theme-toggle"
 
 const navigation = [
-  { to: "/", label: "Alertas", icon: Radar },
-  { to: "/history", label: "Historial", icon: History },
+  { to: "/", label: "Alerts", icon: Radar },
+  { to: "/history", label: "History", icon: History },
 ]
 
 export function AppLayout() {
@@ -28,14 +28,14 @@ export function AppLayout() {
         href="#main-content"
         className="sr-only z-50 rounded-md bg-primary px-4 py-3 text-primary-foreground focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
-        Saltar al contenido
+        Skip to content
       </a>
       <header className="border-b bg-background/95">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-12">
           <Link
             to="/"
             className="flex items-center gap-2.5"
-            aria-label="STW Alerts, inicio"
+            aria-label="STW Alerts home"
           >
             <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Zap className="size-5 fill-current" aria-hidden="true" />
@@ -46,7 +46,7 @@ export function AppLayout() {
             </span>
           </Link>
           <nav
-            aria-label="Navegación principal"
+            aria-label="Main navigation"
             className="order-3 flex w-full gap-1 rounded-lg bg-muted/70 p-1 sm:order-0 sm:w-auto"
           >
             {navigation.map(({ to, label, icon: Icon }) => (
@@ -89,9 +89,7 @@ export function AppLayout() {
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 px-5 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:px-8 lg:px-12">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <span className="font-semibold text-foreground">stw/alerts.</span>
-            <span>
-              Un proyecto de Marcos Silva · {new Date().getFullYear()}
-            </span>
+            <span>A project by Marcos Silva · {new Date().getFullYear()}</span>
           </div>
           <a
             href="https://www.fortnite.com/"
@@ -99,7 +97,7 @@ export function AppLayout() {
             rel="noreferrer"
             className="inline-flex items-center gap-1 hover:text-foreground"
           >
-            Proyecto independiente de Fortnite
+            Independent Fortnite project
             <ArrowUpRight className="size-3" aria-hidden="true" />
           </a>
         </div>

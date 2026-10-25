@@ -1,4 +1,4 @@
-const numberFormatter = new Intl.NumberFormat("es-CL")
+const numberFormatter = new Intl.NumberFormat("en-US")
 
 export function formatNumber(value: number) {
   return numberFormatter.format(value)
@@ -9,7 +9,7 @@ export function formatDate(
   options?: Intl.DateTimeFormatOptions
 ) {
   return new Intl.DateTimeFormat(
-    "es-CL",
+    "en-US",
     options ?? {
       day: "numeric",
       month: "long",

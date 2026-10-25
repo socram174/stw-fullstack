@@ -7,7 +7,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 // Older records use MM/DD/YY, newer ones MM/DD/YYYY. Two-digit years in this
 // archive refer to the 2000s. Keep date-only ISO strings to avoid timezone shifts.
 export function parseAlertDate(value: unknown): string {
-  if (typeof value !== "string") throw new Error("Fecha de alerta inválida.")
+  if (typeof value !== "string") throw new Error("Invalid alert date.")
   const legacy = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/.exec(value)
   const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
   const rawYear = legacy?.[3] ?? iso?.[1]
@@ -21,12 +21,12 @@ export function parseAlertDate(value: unknown): string {
     date.getUTCMonth() !== month - 1 ||
     date.getUTCDate() !== day
   )
-    throw new Error("Fecha de alerta inválida.")
+    throw new Error("Invalid alert date.")
   return date.toISOString().slice(0, 10)
 }
 
 export function normalizeAlerts(payload: unknown): MissionAlert[] {
-  if (!Array.isArray(payload)) throw new Error("Respuesta de alertas inválida.")
+  if (!Array.isArray(payload)) throw new Error("Invalid alerts response.")
   return payload.map((value, index) => {
     if (
       !isRecord(value) ||
@@ -34,7 +34,7 @@ export function normalizeAlerts(payload: unknown): MissionAlert[] {
       !Number.isFinite(value.vbucks) ||
       value.vbucks < 0
     ) {
-      throw new Error("Respuesta de alertas inválida.")
+      throw new Error("Invalid alerts response.")
     }
     const zone = isRecord(value.zone) ? value.zone : {}
     const date = parseAlertDate(value.date)
@@ -45,13 +45,13 @@ export function normalizeAlerts(payload: unknown): MissionAlert[] {
         typeof zone.mission === "string" && zone.mission.trim()
           ? zone.mission.trim()
           : value.vbucks > 0
-            ? "Misión de alerta"
-            : "Sin misiones con pavos",
+            ? "Alert mission"
+            : "No V-Buck missions",
       location: typeof zone.variant === "string" ? zone.variant.trim() : "",
       zone:
         typeof zone.name === "string" && zone.name.trim()
           ? zone.name.trim()
-          : "Sin zona",
+          : "Unknown zone",
       powerLevel:
         typeof value.powerLevel === "number" &&
         Number.isFinite(value.powerLevel)
@@ -87,7 +87,9 @@ export function getAlertStats(alerts: MissionAlert[]) {
     totalVbucks: missions.reduce((total, alert) => total + alert.vbucks, 0),
     missions: missions.length,
     zones: new Set(
-      missions.map((alert) => alert.zone).filter((zone) => zone !== "Sin zona")
+      missions
+        .map((alert) => alert.zone)
+        .filter((zone) => zone !== "Unknown zone")
     ).size,
     minPower: levels.length ? Math.min(...levels) : null,
     days: new Set(alerts.map((alert) => alert.date)).size,

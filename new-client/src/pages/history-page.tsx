@@ -77,26 +77,26 @@ export default function HistoryPage() {
 
   return (
     <div className="space-y-8">
-      <title>Historial de pavos · STW Alerts</title>
+      <title>V-Buck history · STW Alerts</title>
       <meta
         name="description"
-        content="Explora el historial de misiones con pavos en Save the World. Filtra por fecha y zona y consulta las recompensas registradas."
+        content="Explore past V-Buck missions in Save the World. Filter by date and zone to review recorded rewards."
       />
       <PageHeading
-        eyebrow="Cada rotación deja su huella"
+        eyebrow="Your mission archive"
         title={
           <>
-            Cada rotación, <span className="text-primary">en perspectiva.</span>
+            Every rotation, <span className="text-primary">at a glance.</span>
           </>
         }
-        description="Consulta las misiones anteriores y sus recompensas. Filtra por fecha o zona para explorar el historial."
+        description="Explore past missions and their rewards. Filter by date or zone to browse the archive."
       >
         <Button variant="outline" onClick={refetch} disabled={loading}>
           <RefreshCw
             className={loading ? "size-4 animate-spin" : "size-4"}
             aria-hidden="true"
           />
-          Actualizar
+          Refresh
         </Button>
       </PageHeading>
 
@@ -113,23 +113,23 @@ export default function HistoryPage() {
 
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard
-          label="Pavos registrados"
+          label="V-Bucks recorded"
           value={ready ? formatNumber(stats.totalVbucks) : "—"}
-          description="Recompensas de la selección actual"
+          description="Rewards in the current selection"
           icon={Coins}
           loading={loading}
         />
         <StatCard
-          label="Misiones con pavos"
+          label="V-Buck missions"
           value={ready ? formatNumber(stats.missions) : "—"}
-          description="Sin contar los días sin recompensas"
+          description="Excluding days with no rewards"
           icon={Crosshair}
           loading={loading}
         />
         <StatCard
-          label="Días registrados"
+          label="Days recorded"
           value={ready ? formatNumber(stats.days) : "—"}
-          description="Fechas disponibles en esta selección"
+          description="Recorded dates in this selection"
           icon={CalendarDays}
           loading={loading}
         />
@@ -139,11 +139,11 @@ export default function HistoryPage() {
       {status === "error" && (
         <FeedbackState
           error
-          title="No pudimos cargar el historial"
-          description="Los registros no están disponibles en este momento. Intenta nuevamente en unos instantes."
+          title="Unable to load history"
+          description="Records are temporarily unavailable. Try again in a moment."
         >
           <Button variant="outline" onClick={refetch}>
-            Volver a intentar
+            Try again
           </Button>
         </FeedbackState>
       )}
@@ -151,13 +151,13 @@ export default function HistoryPage() {
         <FeedbackState
           title={
             data.length
-              ? "No hay registros con estos filtros"
-              : "El historial aún está por escribirse"
+              ? "No records match these filters"
+              : "No history available yet"
           }
           description={
             data.length
-              ? "Prueba con otras fechas, una zona diferente o una búsqueda más amplia."
-              : "Las alertas aparecerán aquí a medida que se registren nuevas rotaciones."
+              ? "Try different dates, another zone or a broader search."
+              : "Alerts will appear here as new rotations are recorded."
           }
         >
           {hasFilters && (
@@ -165,7 +165,7 @@ export default function HistoryPage() {
               variant="outline"
               onClick={() => setParams({}, { replace: true })}
             >
-              Limpiar filtros
+              Clear filters
             </Button>
           )}
         </FeedbackState>
@@ -179,11 +179,10 @@ export default function HistoryPage() {
                 id="history-heading"
                 className="text-xl font-semibold tracking-tight"
               >
-                Todas las alertas
+                All alerts
               </h2>
               <p className="mt-1 text-xs text-muted-foreground">
-                Las fechas sin misiones con pavos se conservan como registros de
-                cero recompensas.
+                Days without V-Buck missions are kept as zero-reward records.
               </p>
             </div>
             <HistoryTable
