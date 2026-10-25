@@ -42,12 +42,16 @@ export function normalizeAlerts(payload: unknown): MissionAlert[] {
       id: typeof value._id === "string" ? value._id : `${date}-${index}`,
       date,
       mission:
-        typeof zone.mission === "string"
-          ? zone.mission
+        typeof zone.mission === "string" && zone.mission.trim()
+          ? zone.mission.trim()
           : value.vbucks > 0
             ? "Misión de alerta"
             : "Sin misiones con pavos",
-      zone: typeof zone.name === "string" ? zone.name : "Sin zona",
+      location: typeof zone.variant === "string" ? zone.variant.trim() : "",
+      zone:
+        typeof zone.name === "string" && zone.name.trim()
+          ? zone.name.trim()
+          : "Sin zona",
       powerLevel:
         typeof value.powerLevel === "number" &&
         Number.isFinite(value.powerLevel)

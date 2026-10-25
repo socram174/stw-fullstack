@@ -1,12 +1,9 @@
 import { useMemo, useState } from "react"
-import { ArrowRight, Crosshair, Info, Map, RefreshCw, Zap } from "lucide-react"
+import { ArrowRight, CalendarDays, RefreshCw } from "lucide-react"
 import { Link } from "react-router"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { FeedbackState } from "@/components/shared/feedback-state"
-import { PageHeading } from "@/components/shared/page-heading"
-import { StatCard } from "@/components/shared/stat-card"
-import { AlertsSkeleton } from "@/features/alerts/components/alerts-skeleton"
-import { MissionCard } from "@/features/alerts/components/mission-card"
+import { MissionList } from "@/features/alerts/components/mission-list"
 import { MissionFilters } from "@/features/alerts/components/mission-filters"
 import { RewardSummary } from "@/features/alerts/components/reward-summary"
 import { useAlerts } from "@/features/alerts/hooks/use-alerts"
@@ -44,64 +41,60 @@ export default function TodayPage() {
   const ready = status === "success"
 
   return (
-    <div className="space-y-9">
+    <div className="mx-auto max-w-5xl space-y-6">
       <title>Alertas de pavos · STW Alerts</title>
       <meta
         name="description"
         content="Encuentra misiones con pavos en Fortnite Save the World. Consulta recompensas, zonas y niveles de la última rotación disponible."
       />
-      <section
-        className="grid items-center gap-8 pb-1 lg:grid-cols-[1.45fr_1fr] lg:gap-16"
-        aria-label="Resumen de la rotación"
-      >
-        <PageHeading
-          eyebrow="Tu radar de Save the World"
-          title={
-            <>
-              Cada misión cuenta.
-              <br />
-              <span className="text-primary">Cada pavo, también.</span>
-            </>
-          }
-          description="Encuentra las misiones que valen la pena. Todas las alertas de pavos, en un solo lugar."
-        />
-        <RewardSummary
-          total={ready && data.length ? stats.totalVbucks : null}
-          date={latestDate || undefined}
-          loading={loading}
-        />
-      </section>
-
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <StatCard
-          label="Misiones con pavos"
-          value={ready ? stats.missions : "—"}
-          description="Para completar en esta rotación"
-          icon={Crosshair}
-          loading={loading}
-        />
-        <StatCard
-          label="Zonas activas"
-          value={ready ? stats.zones : "—"}
-          description="Regiones con recompensas disponibles"
-          icon={Map}
-          loading={loading}
-        />
-        <StatCard
-          label="Nivel mínimo"
-          value={ready ? (stats.minPower ?? "—") : "—"}
-          description="Poder recomendado para empezar"
-          icon={Zap}
-          loading={loading}
-        />
+      <div className="flex items-start justify-between gap-3 sm:items-center">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold tracking-tight">
+            Alertas de pavos
+          </h1>
+          <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+            <CalendarDays className="size-3.5 shrink-0" aria-hidden="true" />
+            {latestDate ? (
+              <span>
+                Rotación del{" "}
+                <time dateTime={latestDate}>{formatDate(latestDate)}</time>
+              </span>
+            ) : (
+              "Última rotación registrada"
+            )}
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="size-9 shrink-0 p-0 sm:h-8 sm:w-auto sm:px-2.5"
+          aria-label="Actualizar alertas"
+          title="Actualizar alertas"
+          onClick={refetch}
+          disabled={loading}
+        >
+          <RefreshCw
+            className={loading ? "size-3.5 animate-spin" : "size-3.5"}
+            aria-hidden="true"
+          />
+          <span className="hidden sm:inline">Actualizar</span>
+        </Button>
       </div>
 
-      <section aria-labelledby="missions-heading" className="space-y-5">
+      <RewardSummary
+        total={ready && data.length ? stats.totalVbucks : null}
+        missionCount={ready && data.length ? stats.missions : null}
+        zoneCount={ready && data.length ? stats.zones : null}
+        minimumPower={ready ? stats.minPower : null}
+        loading={loading}
+      />
+
+      <section aria-labelledby="missions-heading" className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <h2
               id="missions-heading"
-              className="text-xl font-semibold tracking-tight"
+              className="text-base font-semibold tracking-tight"
             >
               Misiones disponibles
             </h2>
@@ -111,26 +104,14 @@ export default function TodayPage() {
               </span>
             )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={refetch}
-            disabled={loading}
+          <Link
+            to="/history"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
-            <RefreshCw
-              className={loading ? "size-3.5 animate-spin" : "size-3.5"}
-              aria-hidden="true"
-            />
-            Actualizar
-          </Button>
+            Ver historial
+            <ArrowRight className="size-3.5" aria-hidden="true" />
+          </Link>
         </div>
-        {ready && latestDate && (
-          <p className="-mt-2 text-xs text-muted-foreground">
-            Última fecha registrada:{" "}
-            <time dateTime={latestDate}>{formatDate(latestDate)}</time>. Las
-            alertas corresponden a esa rotación.
-          </p>
-        )}
         <MissionFilters
           value={filters}
           onChange={setFilters}
@@ -138,7 +119,7 @@ export default function TodayPage() {
           disabled={!ready}
         />
 
-        {loading && <AlertsSkeleton />}
+        {loading && <MissionList alerts={[]} loading />}
         {status === "error" && (
           <FeedbackState
             error
@@ -155,7 +136,7 @@ export default function TodayPage() {
           <FeedbackState
             title={
               data.length
-                ? "Esta rotación viene sin pavos"
+                ? "Sin misiones con pavos en esta rotación"
                 : "Todavía no hay alertas disponibles"
             }
             description={
@@ -191,39 +172,10 @@ export default function TodayPage() {
             <p className="sr-only" role="status">
               {filtered.length} misiones encontradas
             </p>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((alert) => (
-                <MissionCard key={alert.id} alert={alert} />
-              ))}
-            </div>
+            <MissionList alerts={filtered} />
           </>
         )}
       </section>
-
-      <aside className="flex flex-col justify-between gap-5 rounded-xl border bg-card px-5 py-5 sm:flex-row sm:items-center sm:px-6">
-        <div className="flex gap-3">
-          <Info
-            className="mt-0.5 size-4 shrink-0 text-primary"
-            aria-hidden="true"
-          />
-          <div>
-            <p className="text-sm font-medium">
-              Un vistazo al pasado también ayuda.
-            </p>
-            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-              Explora las rotaciones anteriores y descubre cuántos pavos se han
-              registrado.
-            </p>
-          </div>
-        </div>
-        <Link
-          to="/history"
-          className="inline-flex shrink-0 items-center gap-2 text-sm font-medium text-primary hover:underline"
-        >
-          Ver historial
-          <ArrowRight className="size-4" aria-hidden="true" />
-        </Link>
-      </aside>
     </div>
   )
 }

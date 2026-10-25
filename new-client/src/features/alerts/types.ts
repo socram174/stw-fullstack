@@ -4,6 +4,7 @@ export interface MissionAlert {
   id: string
   date: string
   mission: string
+  location: string
   zone: string
   powerLevel: number
   vbucks: number

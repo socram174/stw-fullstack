@@ -32,7 +32,7 @@ src/
   features/
     alerts/
       api/                    # Consultas y adaptación del contrato del backend
-      components/             # Tarjetas, filtros, resumen y zonas
+      components/             # Listado de misiones, filtros, resumen y zonas
       hooks/                  # Carga, cancelación, reintentos y estados
       lib/                    # Normalización, filtros, agrupación y estadísticas
       types.ts                # Modelo de datos que consume la interfaz

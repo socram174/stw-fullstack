@@ -182,3 +182,29 @@ test("after-reset markers and unknown zones survive normalization", () => {
   assert.equal(alert.afterReset, true)
   assert.equal(alert.zone, "New region")
 })
+
+test("scraped mission and zone names are trimmed before filtering and grouping", () => {
+  const alerts = normalizeAlerts([
+    {
+      ...payload[0],
+      zone: {
+        name: "    Canny Valley",
+        mission: "    Repair the Shelter   ",
+        variant: " Thunder Route 99 ",
+      },
+    },
+    {
+      ...payload[1],
+      zone: { name: "Canny Valley  ", mission: "Repair the Shelter" },
+    },
+  ])
+  assert.equal(alerts[0].mission, "Repair the Shelter")
+  assert.equal(alerts[0].location, "Thunder Route 99")
+  assert.equal(alerts[1].location, "")
+  assert.deepEqual(getZones(alerts), ["Canny Valley"])
+  assert.equal(
+    filterAlerts(alerts, { ...filters, zone: "Canny Valley" }).length,
+    2
+  )
+  assert.equal(getAlertStats(alerts).zones, 1)
+})

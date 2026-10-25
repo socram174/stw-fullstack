@@ -1,52 +1,63 @@
-import { Coins, Crosshair } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatDate, formatNumber } from "@/lib/format"
+import { formatNumber } from "@/lib/format"
+import { cn } from "@/lib/utils"
 
 export function RewardSummary({
   total,
-  date,
+  missionCount,
+  zoneCount,
+  minimumPower,
   loading,
 }: {
   total: number | null
-  date?: string
+  missionCount: number | null
+  zoneCount: number | null
+  minimumPower: number | null
   loading: boolean
 }) {
   return (
-    <div className="relative isolate overflow-hidden rounded-2xl bg-[#102d24] p-7 text-white sm:p-8">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-20 -right-16 -z-10 size-72 rounded-full border border-white/10"
-      >
-        <div className="absolute inset-8 rounded-full border border-white/10" />
-        <div className="absolute inset-16 rounded-full border border-white/10" />
-      </div>
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-xs font-medium tracking-[0.12em] text-emerald-100/70 uppercase">
-          Pavos disponibles
-        </p>
-        <Coins className="size-5 text-emerald-300" aria-hidden="true" />
-      </div>
-      {loading ? (
-        <Skeleton className="mt-6 mb-2 h-16 w-28 bg-white/10" />
-      ) : (
-        <p className="mt-5 text-7xl leading-none font-semibold tracking-[-0.06em] tabular-nums">
-          {total === null ? "—" : formatNumber(total)}
-          <span className="ml-2 text-sm font-normal tracking-normal text-emerald-100/70">
-            pavos
-          </span>
-        </p>
-      )}
-      <div className="mt-7 flex items-center gap-2 border-t border-white/10 pt-4 text-xs text-emerald-100/70">
-        <Crosshair
-          className="size-3.5 shrink-0 text-emerald-300"
-          aria-hidden="true"
-        />
-        <span>
-          {date
-            ? `Rotación del ${formatDate(date, { day: "numeric", month: "long" })}`
-            : "Última rotación registrada"}
-        </span>
-      </div>
-    </div>
+    <dl
+      aria-label="Resumen de la rotación"
+      className="grid grid-cols-2 overflow-hidden rounded-lg border bg-card sm:grid-cols-4"
+    >
+      {[
+        { label: "Pavos disponibles", value: total, unit: "pavos" },
+        { label: "Misiones", value: missionCount },
+        { label: "Zonas", value: zoneCount },
+        { label: "Nivel mínimo", value: minimumPower, unit: "PL" },
+      ].map(({ label, value, unit }, index) => (
+        <div
+          key={label}
+          className={cn(
+            "px-4 py-4 sm:px-5 sm:py-5",
+            index < 2 && "border-b sm:border-b-0",
+            index % 2 === 0 && "border-r",
+            index === 1 && "sm:border-r",
+            index === 0 && "bg-primary/[0.04]"
+          )}
+        >
+          <dt className="text-xs text-muted-foreground">{label}</dt>
+          <dd
+            className={cn(
+              "mt-2 flex items-baseline gap-1.5 text-2xl font-semibold tracking-tight tabular-nums",
+              index === 0 && "text-primary"
+            )}
+          >
+            {loading ? (
+              <Skeleton className="h-8 w-14" />
+            ) : (
+              <>
+                {value === null ? "—" : formatNumber(value)}
+                {value !== null && unit && (
+                  <span className="text-xs font-normal tracking-normal text-muted-foreground">
+                    {unit}
+                  </span>
+                )}
+              </>
+            )}
+          </dd>
+        </div>
+      ))}
+    </dl>
   )
 }
