@@ -6,13 +6,9 @@ import { FeedbackState } from "@/components/shared/feedback-state"
 import { MissionList } from "@/features/alerts/components/mission-list"
 import { MissionFilters } from "@/features/alerts/components/mission-filters"
 import { RewardSummary } from "@/features/alerts/components/reward-summary"
-import { useAlerts } from "@/features/alerts/hooks/use-alerts"
-import {
-  filterAlerts,
-  getAlertStats,
-  getZones,
-} from "@/features/alerts/lib/alerts"
-import type { MissionFiltersValue } from "@/features/alerts/types"
+import { useLatestAlerts } from "@/features/alerts/hooks/use-alerts"
+import { filterAlerts, getZones } from "@/features/alerts/lib/alerts"
+import type { MissionAlert, MissionFiltersValue } from "@/features/alerts/types"
 import { formatDate } from "@/lib/format"
 
 const initialFilters: MissionFiltersValue = {
@@ -21,10 +17,13 @@ const initialFilters: MissionFiltersValue = {
   sort: "power",
 }
 
+const emptyAlerts: MissionAlert[] = []
+
 export default function TodayPage() {
-  const { data, status, refetch } = useAlerts("today")
+  const { data: response, status, refetch } = useLatestAlerts()
+  const data = response?.data ?? emptyAlerts
   const [filters, setFilters] = useState(initialFilters)
-  const stats = useMemo(() => getAlertStats(data), [data])
+  const stats = response?.summary
   const missions = useMemo(
     () => data.filter((alert) => alert.vbucks > 0),
     [data]
@@ -33,10 +32,8 @@ export default function TodayPage() {
     () => filterAlerts(missions, filters),
     [missions, filters]
   )
-  const latestDate = data.reduce(
-    (latest, alert) => (alert.date > latest ? alert.date : latest),
-    ""
-  )
+  const latestDate = response?.rotation?.date
+  const recorded = Boolean(response?.rotation)
   const loading = status === "loading"
   const ready = status === "success"
 
@@ -82,10 +79,10 @@ export default function TodayPage() {
       </div>
 
       <RewardSummary
-        total={ready && data.length ? stats.totalVbucks : null}
-        missionCount={ready && data.length ? stats.missions : null}
-        zoneCount={ready && data.length ? stats.zones : null}
-        minimumPower={ready ? stats.minPower : null}
+        total={recorded ? (stats?.totalVbucks ?? null) : null}
+        missionCount={recorded ? (stats?.missions ?? null) : null}
+        zoneCount={recorded ? (stats?.zones ?? null) : null}
+        minimumPower={stats?.minPower ?? null}
         loading={loading}
       />
 
@@ -135,12 +132,12 @@ export default function TodayPage() {
         {ready && !missions.length && (
           <FeedbackState
             title={
-              data.length
+              recorded
                 ? "No V-Buck missions in this rotation"
                 : "No alerts available yet"
             }
             description={
-              data.length
+              recorded
                 ? "No V-Buck missions were recorded for this rotation. Explore rewards from previous days in the history."
                 : "Missions and rewards will appear here once a rotation has been recorded."
             }

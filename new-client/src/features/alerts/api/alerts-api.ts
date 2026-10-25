@@ -1,15 +1,14 @@
 import { apiRequest } from "@/lib/http"
-import { normalizeAlerts } from "../lib/alerts"
-import type { AlertScope } from "../types"
+import { parseHistoryResponse, parseLatestResponse } from "./alert-response"
 
-export async function fetchAlerts(scope: AlertScope, signal: AbortSignal) {
-  // Despite its name, /update is a read endpoint for the latest stored rotation.
-  const payload = await apiRequest(
-    scope === "today" ? "/alerts/update" : "/alerts",
-    {
-      method: scope === "today" ? "POST" : "GET",
-      signal,
-    }
+export async function fetchLatestAlerts(signal: AbortSignal) {
+  return parseLatestResponse(
+    await apiRequest("/api/v1/alerts/latest", { signal })
   )
-  return normalizeAlerts(payload)
+}
+
+export async function fetchAlertHistory(query: string, signal: AbortSignal) {
+  return parseHistoryResponse(
+    await apiRequest(`/api/v1/alerts?${query}`, { signal })
+  )
 }

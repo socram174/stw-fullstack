@@ -25,6 +25,7 @@ export function HistoryFilters({
   zones,
   disabled,
   loading,
+  error,
   resultCount,
   onApply,
   onClear,
@@ -33,6 +34,7 @@ export function HistoryFilters({
   zones: string[]
   disabled: boolean
   loading: boolean
+  error: boolean
   resultCount: number
   onApply: (value: HistoryFiltersValue) => void
   onClear: () => void
@@ -140,7 +142,7 @@ export function HistoryFilters({
           className="col-span-2 w-full text-xs text-muted-foreground sm:ml-auto sm:w-auto"
           role="status"
         >
-          {!disabled
+          {!disabled && !error
             ? `${formatNumber(resultCount)} ${resultCount === 1 ? "record" : "records"} in this selection`
             : loading
               ? "Loading records…"

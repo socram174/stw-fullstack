@@ -1,4 +1,3 @@
-import { useMemo } from "react"
 import { CalendarDays, Coins, Crosshair, RefreshCw } from "lucide-react"
 import { useSearchParams } from "react-router"
 import { Button } from "@/components/ui/button"
@@ -6,13 +5,7 @@ import { FeedbackState } from "@/components/shared/feedback-state"
 import { PageHeading } from "@/components/shared/page-heading"
 import { StatCard } from "@/components/shared/stat-card"
 import { AlertsSkeleton } from "@/features/alerts/components/alerts-skeleton"
-import { useAlerts } from "@/features/alerts/hooks/use-alerts"
-import {
-  filterAlerts,
-  getAlertStats,
-  getDailyRewards,
-  getZones,
-} from "@/features/alerts/lib/alerts"
+import { useAlertHistory } from "@/features/alerts/hooks/use-alerts"
 import {
   HistoryFilters,
   type HistoryFiltersValue,
@@ -25,7 +18,6 @@ import { RewardChart } from "@/features/history/components/reward-chart"
 import { formatNumber } from "@/lib/format"
 
 export default function HistoryPage() {
-  const { data, status, refetch } = useAlerts("history")
   const [params, setParams] = useSearchParams()
   const search = params.get("q") ?? ""
   const zone = params.get("zone") ?? ""
@@ -34,18 +26,19 @@ export default function HistoryPage() {
     sortParam === "power" || sortParam === "reward" ? sortParam : "recent"
   const from = params.get("from") ?? ""
   const to = params.get("to") ?? ""
-  const invalidRange = Boolean(from && to && from > to)
-  const filtered = useMemo(
-    () => filterAlerts(data, { search, zone, sort }, from, to),
-    [data, search, zone, sort, from, to]
-  )
-  const stats = useMemo(() => getAlertStats(filtered), [filtered])
-  const days = useMemo(() => getDailyRewards(filtered), [filtered])
   const pageParam = Number(params.get("page"))
-  const page = Math.min(
-    Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1,
-    Math.max(1, Math.ceil(filtered.length / HISTORY_PAGE_SIZE))
-  )
+  const page = Number.isSafeInteger(pageParam) && pageParam > 0 ? pageParam : 1
+  const query = new URLSearchParams({
+    sort,
+    page: String(page),
+    limit: String(HISTORY_PAGE_SIZE),
+  })
+  for (const [key, value] of Object.entries({ q: search, zone, from, to })) {
+    if (value) query.set(key, value)
+  }
+  const { data: response, status, refetch } = useAlertHistory(query.toString())
+  const stats = response?.summary
+  const total = response?.pagination.total ?? 0
   const hasFilters = Boolean(search || zone || from || to || sort !== "recent")
   const loading = status === "loading"
   const ready = status === "success"
@@ -103,10 +96,11 @@ export default function HistoryPage() {
       <HistoryFilters
         key={JSON.stringify([search, zone, sort, from, to])}
         value={{ search, zone, sort, from, to }}
-        zones={getZones(data)}
-        disabled={!ready}
+        zones={response?.zones ?? []}
+        disabled={loading}
         loading={loading}
-        resultCount={filtered.length}
+        error={status === "error"}
+        resultCount={total}
         onApply={updateFilters}
         onClear={() => setParams({}, { replace: true })}
       />
@@ -114,21 +108,21 @@ export default function HistoryPage() {
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard
           label="V-Bucks recorded"
-          value={ready ? formatNumber(stats.totalVbucks) : "—"}
+          value={stats ? formatNumber(stats.totalVbucks) : "—"}
           description="Rewards in the current selection"
           icon={Coins}
           loading={loading}
         />
         <StatCard
           label="V-Buck missions"
-          value={ready ? formatNumber(stats.missions) : "—"}
+          value={stats ? formatNumber(stats.missions) : "—"}
           description="Excluding days with no rewards"
           icon={Crosshair}
           loading={loading}
         />
         <StatCard
           label="Days recorded"
-          value={ready ? formatNumber(stats.days) : "—"}
+          value={stats ? formatNumber(stats.days) : "—"}
           description="Recorded dates in this selection"
           icon={CalendarDays}
           loading={loading}
@@ -147,15 +141,15 @@ export default function HistoryPage() {
           </Button>
         </FeedbackState>
       )}
-      {ready && !invalidRange && filtered.length === 0 && (
+      {ready && total === 0 && (
         <FeedbackState
           title={
-            data.length
+            hasFilters
               ? "No records match these filters"
               : "No history available yet"
           }
           description={
-            data.length
+            hasFilters
               ? "Try different dates, another zone or a broader search."
               : "Alerts will appear here as new rotations are recorded."
           }
@@ -170,9 +164,9 @@ export default function HistoryPage() {
           )}
         </FeedbackState>
       )}
-      {ready && !invalidRange && filtered.length > 0 && (
+      {ready && response && total > 0 && (
         <>
-          <RewardChart days={days} />
+          <RewardChart days={response.dailyRewards} />
           <section aria-labelledby="history-heading" className="space-y-4">
             <div>
               <h2
@@ -186,8 +180,8 @@ export default function HistoryPage() {
               </p>
             </div>
             <HistoryTable
-              alerts={filtered}
-              page={page}
+              alerts={response.data}
+              pagination={response.pagination}
               onPageChange={(next) =>
                 updateParams({ page: String(next) }, false)
               }

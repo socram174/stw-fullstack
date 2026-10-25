@@ -13,7 +13,8 @@ npm run dev
 Por defecto, las consultas a `/api` se envían al backend local en
 `http://localhost:6001` mediante el proxy de Vite. El backend debe estar
 ejecutándose y conectado a MongoDB. Para usar otra dirección, copia
-`.env.example` a `.env.local` y cambia `VITE_BASE_APP_URL`. Reinicia Vite después
+`.env.example` a `.env.local` y cambia `VITE_BASE_APP_URL` por el origen del backend,
+sin añadir `/api`. Déjalo vacío para usar el mismo origen. Reinicia Vite después
 de editar variables de entorno. Esta variable es pública: no incluyas secretos.
 
 ```dotenv
@@ -34,7 +35,7 @@ src/
       api/                    # Consultas y adaptación del contrato del backend
       components/             # Listado de misiones, filtros, resumen y zonas
       hooks/                  # Carga, cancelación, reintentos y estados
-      lib/                    # Normalización, filtros, agrupación y estadísticas
+      lib/                    # Filtros locales de las misiones de la portada
       types.ts                # Modelo de datos que consume la interfaz
     history/
       components/             # Tabla paginada y gráfico de recompensas
@@ -44,23 +45,23 @@ tests/                        # Casos del contrato y reglas de datos
 ```
 
 Las páginas componen la interfaz. Los componentes de presentación no hacen
-consultas. `alerts/api` adapta la respuesta antigua a un modelo tipado, para que
-los componentes no dependan de campos como `zone.mission` o `_id`.
-Los filtros y las estadísticas son funciones puras compartidas por ambas páginas.
+consultas. `alerts/api` valida el contrato versionado del backend y los hooks
+gestionan carga, cancelación y reintentos. El backend normaliza los datos y
+calcula los totales; el frontend solo filtra localmente las misiones de la portada.
 
 ## Comportamiento y contrato
 
-- `/`: `POST /alerts/update`, la última rotación registrada por el backend.
+- `/`: `GET /api/v1/alerts/latest`, la última rotación registrada por el backend.
   Esta ruta consulta datos; no solicita una actualización al recolector.
   Se muestra la fecha real del registro, sin asumir que corresponde a hoy.
-- `/history`: `GET /alerts`, con búsqueda, zona, fechas inclusivas,
-  ordenamiento y paginación de 15 registros. Los filtros y la página se
-  guardan en la URL. Edita los filtros y pulsa **Aplicar filtros** o Enter.
-  La tabla, los totales y el gráfico usan la misma selección.
+- `/history`: `GET /api/v1/alerts`, con búsqueda, zona, fechas inclusivas,
+  ordenamiento y paginación de 15 registros en el servidor. Los filtros y la
+  página se guardan en la URL. Edita los filtros y pulsa **Apply filters** o Enter.
+  La tabla recibe una página; los totales y el gráfico incluyen toda la selección.
 - El gráfico muestra hasta 30 fechas **registradas**; los huecos entre fechas
   no se interpretan como días sin recompensas.
 - Los registros de cero pavos se conservan para el historial, pero no cuentan
-  como misiones. Las fechas `MM/DD/YYYY` y las antiguas `MM/DD/YY` se convierten
+  como misiones. El backend convierte las fechas `MM/DD/YYYY` y las antiguas `MM/DD/YY`
   a `YYYY-MM-DD` sin desplazamientos de zona horaria. Los años de dos dígitos
   del archivo se interpretan como años de los 2000.
 - Las respuestas HTTP fallidas o con formato inválido muestran un error con
@@ -69,9 +70,8 @@ Los filtros y las estadísticas son funciones puras compartidas por ambas págin
   15 segundos. El historial y su gráfico se cargan al navegar a esa página.
 - Tema claro/oscuro, preferencia del sistema, botón de tema y atajo `D`.
 
-El backend actual devuelve el historial completo. El filtrado y la paginación
-ocurren en el cliente. Para un volumen mucho mayor, la siguiente mejora sería
-agregar filtros y paginación en el servidor conservando estos componentes.
+El contrato y las limitaciones del almacenamiento antiguo se describen en
+[`server/README.md`](../server/README.md).
 
 ## Verificación
 
@@ -83,12 +83,14 @@ npm run build
 ```
 
 Las pruebas usan el ejecutor de Node, sin otro framework; requieren Node 22.18+
-o 24+. Cubren fechas, respuestas inválidas, registros sin pavos, búsqueda,
-ordenamiento, filtros combinados y totales diarios.
+o 24+. Cubren el contrato versionado, respuestas inválidas, filtros y ordenamiento
+local. Las pruebas del backend cubren fechas antiguas, consultas, paginación,
+resúmenes, registros sin pavos y errores HTTP.
 
 ## Producción
 
-Define `VITE_BASE_APP_URL` con la URL pública del backend **antes** de ejecutar
+Despliega primero el backend para habilitar las rutas nuevas. Define
+`VITE_BASE_APP_URL` con el origen público del backend (sin `/api`) **antes** de ejecutar
 `npm run build`. El proxy de `/api` funciona únicamente en el servidor de
 desarrollo; si mantienes `/api` en producción, configura un proxy equivalente
 en tu alojamiento. Cuando front y back usen orígenes distintos, el backend debe

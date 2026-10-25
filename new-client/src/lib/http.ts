@@ -1,5 +1,5 @@
 const apiBaseUrl = (
-  import.meta.env.VITE_BASE_APP_URL?.trim() || "/api"
+  import.meta.env.VITE_BASE_APP_URL?.trim() || ""
 ).replace(/\/+$/, "")
 
 export async function apiRequest(

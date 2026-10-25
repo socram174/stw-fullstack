@@ -6,34 +6,17 @@ export const getAlerts = async (req, res) => {
         const alerts = await Alert.find();
         res.status(200).json(alerts);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        res.status(500).json({ message: 'Unable to load alerts.' });
     }
 }
 
 export const getTodayAlerts = async (req, res) => {
-    //const {date} = req.body;
-    const date = await Log.find();
     try {
+        const date = await Log.find();
+        if (!date.length) return res.status(200).json([]);
         const alerts = await Alert.find({date: date[0].lastUpdated});
         res.status(200).json(alerts);
     } catch (error) {
-        res.status(404).json({ message: error.message });
+        res.status(500).json({ message: 'Unable to load alerts.' });
     }
-}
-
-// Octokit.js
-// https://github.com/octokit/core.js#readme
-//import { Octokit } from "@octokit/core";
-
-export const updateAlerts = async() => {
-    const octokit = new Octokit({
-        auth: process.env.GITHUB_TOKEN,
-      })
-      
-      await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
-        owner: 'socram174',
-        repo: 'STWalerts',
-        workflow_id: 'main.yml',
-        ref: 'master',
-      })
 }

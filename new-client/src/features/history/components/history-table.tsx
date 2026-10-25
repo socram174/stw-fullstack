@@ -10,22 +10,22 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { ZoneBadge } from "@/features/alerts/components/zone-badge"
-import type { MissionAlert } from "@/features/alerts/types"
+import type { HistoryPagination, MissionAlert } from "@/features/alerts/types"
 import { formatDate, formatNumber } from "@/lib/format"
 
 export const HISTORY_PAGE_SIZE = 15
 
 export function HistoryTable({
   alerts,
-  page,
+  pagination,
   onPageChange,
 }: {
   alerts: MissionAlert[]
-  page: number
+  pagination: HistoryPagination
   onPageChange: (page: number) => void
 }) {
-  const totalPages = Math.max(1, Math.ceil(alerts.length / HISTORY_PAGE_SIZE))
-  const start = (page - 1) * HISTORY_PAGE_SIZE
+  const { page, limit, total, totalPages } = pagination
+  const start = (page - 1) * limit
   return (
     <div className="overflow-hidden rounded-xl border bg-card">
       <Table>
@@ -47,7 +47,7 @@ export function HistoryTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {alerts.slice(start, start + HISTORY_PAGE_SIZE).map((alert) => (
+          {alerts.map((alert) => (
             <TableRow key={alert.id}>
               <TableCell className="py-4 pl-5 text-muted-foreground">
                 <time dateTime={alert.date}>
@@ -89,10 +89,8 @@ export function HistoryTable({
       </Table>
       <div className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-4">
         <p className="text-xs text-muted-foreground">
-          {formatNumber(start + 1)}–
-          {formatNumber(Math.min(start + HISTORY_PAGE_SIZE, alerts.length))} of{" "}
-          {formatNumber(alerts.length)}{" "}
-          {alerts.length === 1 ? "record" : "records"}
+          {formatNumber(start + 1)}–{formatNumber(start + alerts.length)} of{" "}
+          {formatNumber(total)} {total === 1 ? "record" : "records"}
         </p>
         <nav
           aria-label="History pagination"
