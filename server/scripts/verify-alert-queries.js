@@ -17,9 +17,11 @@ try {
     const records = await collection.find().toArray();
     assert.ok(records.length > 0, 'No alerts to verify');
     const dates = normalizeAlerts(records).map((row) => row.date).sort();
+    const latestDate = dates[dates.length - 1];
+    const chartStartDate = dates.slice(-30)[0];
     const queries = [
         {}, { page: '2', limit: '15' }, { sort: 'reward', limit: '1' }, { sort: 'power', page: '2' },
-        { from: dates.at(-30), to: dates.at(-1) }, { from: '2025-12-25', to: '2026-01-05' },
+        { from: chartStartDate, to: latestDate }, { from: '2025-12-25', to: '2026-01-05' },
         { from: '2022-11-27', to: '2022-12-31' }, { from: '2099-01-01' },
         { zone: 'Canny Valley', q: 'REPAIR', from: '2026-10-01', to: '2026-10-25' },
         { q: '70', sort: 'power' }, { q: '.*' }, { zone: 'not present' },
@@ -52,7 +54,7 @@ try {
         }
         const logs = await mongoose.connection.db.collection('logs').find().toArray();
         assert.deepEqual(await repository.getLatest(), buildLatest(normalizeAlerts(records), logs));
-        const explanation = await collection.find({ date: { $gte: dates.at(-30), $lte: dates.at(-1) } })
+        const explanation = await collection.find({ date: { $gte: chartStartDate, $lte: latestDate } })
             .sort({ date: -1, vbucks: -1, _id: 1 }).limit(15).explain('queryPlanner');
         const plan = JSON.stringify(explanation.queryPlanner.winningPlan);
         assert.ok(plan.includes('alerts_date_reward_id'), 'Expected date index was not selected');

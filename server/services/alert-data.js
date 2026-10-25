@@ -92,7 +92,7 @@ export function buildHistory(alerts, filters) {
 export function buildLatest(alerts, logs) {
     // Never depend on MongoDB's natural order or assume the record is for today.
     const dates = [...alerts.map((alert) => alert.date), ...logs.map((log) => parseAlertDate(log.lastUpdated))];
-    const date = dates.sort().at(-1);
+    const date = dates.sort().pop();
     const data = date ? alerts.filter((alert) => alert.date === date).sort((a, b) => a.powerLevel - b.powerLevel || a.id.localeCompare(b.id)) : [];
     return {
         data,

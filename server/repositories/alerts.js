@@ -46,7 +46,7 @@ export function createAlertRepository(AlertModel = Alert, LogModel = Log) {
                 AlertModel.findOne().sort({ date: -1, vbucks: -1, _id: 1 }).select('date').lean().exec(),
                 findLogs(),
             ]);
-            const date = [newest?.date, ...logs.map((log) => parseAlertDate(log.lastUpdated))].filter(Boolean).sort().at(-1);
+            const date = [newest?.date, ...logs.map((log) => parseAlertDate(log.lastUpdated))].filter(Boolean).sort().pop();
             const records = date ? await AlertModel.find({ date }).lean().exec() : [];
             return buildLatest(normalizeAlerts(records), logs);
         },

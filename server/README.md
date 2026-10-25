@@ -1,8 +1,12 @@
 # Alerts API
 
-Run `npm install` and `npm start` from `server/`. The existing `MONGO_URL`
+Use Node.js 24.x, matching the frontend. Run `npm install` and `npm start` from `server/`. The existing `MONGO_URL`
 and `PORT` environment variables still apply. Run `npm test` for unit, migration
 and HTTP contract tests; these do not connect to MongoDB.
+
+On Render, check the backend service's `NODE_VERSION` environment variable: it
+overrides the version declared in `package.json`. Set it to `24` if configured.
+Version precedence is documented in [Render's Node.js version guide](https://render.com/docs/node-version).
 
 ## Version 1
 
