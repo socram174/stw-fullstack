@@ -8,6 +8,11 @@ On Render, check the backend service's `NODE_VERSION` environment variable: it
 overrides the version declared in `package.json`. Set it to `24` if configured.
 Version precedence is documented in [Render's Node.js version guide](https://render.com/docs/node-version).
 
+The backend uses Express 5 and Mongoose 9. Express forwards rejected async route
+handlers to the API error middleware. MongoDB connections use the current driver
+defaults; the obsolete `useNewUrlParser` and `useUnifiedTopology` options must not
+be passed to `mongoose.connect()`.
+
 ## Version 1
 
 All endpoints below are read-only. They do not run the collector or send notifications.

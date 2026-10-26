@@ -8,7 +8,6 @@ export function createAlertRouter(repository) {
     router.get('/latest', controllers.latest);
     router.get('/', controllers.history);
     router.use((req, res) => res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Alert endpoint not found.' } }));
-    // Express 4 requires async failures to be explicitly forwarded to middleware.
     router.use((error, req, res, next) => {
         if (res.headersSent) return next(error);
         const invalid = error instanceof InvalidQuery;
