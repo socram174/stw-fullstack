@@ -1,5 +1,6 @@
 import type {
   AlertHistoryResponse,
+  AlertRewardsResponse,
   AlertSummary,
   LatestAlertsResponse,
   MissionAlert,
@@ -51,9 +52,7 @@ function summary(value: unknown): value is AlertSummary {
   )
 }
 
-function base(
-  value: unknown
-): value is Record<string, unknown> & {
+function base(value: unknown): value is Record<string, unknown> & {
   data: MissionAlert[]
   summary: AlertSummary
 } {
@@ -107,4 +106,42 @@ export function parseHistoryResponse(value: unknown): AlertHistoryResponse {
     throw new Error("Invalid alert history response.")
   }
   return value as unknown as AlertHistoryResponse
+}
+
+export function parseRewardsResponse(value: unknown): AlertRewardsResponse {
+  if (
+    !record(value) ||
+    !["7d", "1m", "6m", "1y"].includes(String(value.period)) ||
+    !["day", "week", "month"].includes(String(value.interval)) ||
+    !date(value.from) ||
+    !date(value.to) ||
+    value.from > value.to ||
+    !Array.isArray(value.data) ||
+    value.data.length === 0
+  ) {
+    throw new Error("Invalid alert rewards response.")
+  }
+  const { from, to } = value
+  if (
+    !value.data.every(
+      (bucket) =>
+        record(bucket) &&
+        date(bucket.date) &&
+        date(bucket.endDate) &&
+        bucket.date >= from &&
+        bucket.endDate <= to &&
+        bucket.date <= bucket.endDate &&
+        integer(bucket.missions) &&
+        integer(bucket.recordedDays) &&
+        integer(bucket.totalDays) &&
+        bucket.totalDays > 0 &&
+        bucket.recordedDays <= bucket.totalDays &&
+        (bucket.recordedDays === 0
+          ? bucket.vbucks === null && bucket.missions === 0
+          : nonNegative(bucket.vbucks))
+    )
+  ) {
+    throw new Error("Invalid alert rewards response.")
+  }
+  return value as unknown as AlertRewardsResponse
 }

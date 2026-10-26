@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react"
-import { fetchAlertHistory, fetchLatestAlerts } from "../api/alerts-api"
+import {
+  fetchAlertHistory,
+  fetchLatestAlerts,
+  fetchAlertRewards,
+} from "../api/alerts-api"
+import type { RewardPeriod } from "../types"
 
 type RequestState<T> = {
   key: string
@@ -47,4 +52,11 @@ export function useLatestAlerts() {
 
 export function useAlertHistory(query: string) {
   return useAlertRequest(query, fetchAlertHistory)
+}
+
+const rewards = (period: string, signal: AbortSignal) =>
+  fetchAlertRewards(period as RewardPeriod, signal)
+
+export function useAlertRewards(period: RewardPeriod) {
+  return useAlertRequest(period, rewards)
 }

@@ -2,6 +2,17 @@ import { parseAlertDate } from '../services/alert-data.js';
 
 export class InvalidQuery extends Error {}
 
+export function parseRewardQuery(query) {
+    if (Object.keys(query).some((key) => key !== 'period')) {
+        throw new InvalidQuery('Only period is supported for reward charts.');
+    }
+    const period = query.period ?? '1m';
+    if (!['7d', '1m', '6m', '1y'].includes(period)) {
+        throw new InvalidQuery('period must be 7d, 1m, 6m or 1y.');
+    }
+    return period;
+}
+
 export function parseAlertQuery(query) {
     const allowed = new Set(['from', 'to', 'q', 'zone', 'sort', 'page', 'limit']);
     for (const key of Object.keys(query)) {

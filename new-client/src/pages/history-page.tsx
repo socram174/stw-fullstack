@@ -1,11 +1,16 @@
 import { CalendarDays, Coins, Crosshair, RefreshCw } from "lucide-react"
+import { useState } from "react"
 import { useSearchParams } from "react-router"
 import { Button } from "@/components/ui/button"
 import { FeedbackState } from "@/components/shared/feedback-state"
 import { PageHeading } from "@/components/shared/page-heading"
 import { StatCard } from "@/components/shared/stat-card"
 import { AlertsSkeleton } from "@/features/alerts/components/alerts-skeleton"
-import { useAlertHistory } from "@/features/alerts/hooks/use-alerts"
+import {
+  useAlertHistory,
+  useAlertRewards,
+} from "@/features/alerts/hooks/use-alerts"
+import type { RewardPeriod } from "@/features/alerts/types"
 import {
   HistoryFilters,
   type HistoryFiltersValue,
@@ -18,6 +23,8 @@ import { RewardChart } from "@/features/history/components/reward-chart"
 import { formatNumber } from "@/lib/format"
 
 export default function HistoryPage() {
+  const [chartPeriod, setChartPeriod] = useState<RewardPeriod>("1m")
+  const chart = useAlertRewards(chartPeriod)
   const [params, setParams] = useSearchParams()
   const search = params.get("q") ?? ""
   const zone = params.get("zone") ?? ""
@@ -84,7 +91,14 @@ export default function HistoryPage() {
         }
         description="Explore past missions and their rewards. Filter by date or zone to browse the archive."
       >
-        <Button variant="outline" onClick={refetch} disabled={loading}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            refetch()
+            chart.refetch()
+          }}
+          disabled={loading}
+        >
           <RefreshCw
             className={loading ? "size-4 animate-spin" : "size-4"}
             aria-hidden="true"
@@ -129,6 +143,14 @@ export default function HistoryPage() {
         />
       </div>
 
+      <RewardChart
+        period={chartPeriod}
+        onPeriodChange={setChartPeriod}
+        response={chart.data}
+        status={chart.status}
+        onRetry={chart.refetch}
+      />
+
       {loading && <AlertsSkeleton />}
       {status === "error" && (
         <FeedbackState
@@ -166,7 +188,6 @@ export default function HistoryPage() {
       )}
       {ready && response && total > 0 && (
         <>
-          <RewardChart days={response.dailyRewards} />
           <section aria-labelledby="history-heading" className="space-y-4">
             <div>
               <h2

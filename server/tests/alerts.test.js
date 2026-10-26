@@ -5,6 +5,7 @@ import express from 'express';
 import { createAlertRouter } from '../routes/alerts-v1.js';
 import { buildHistory, buildLatest, normalizeAlerts, parseAlertDate } from '../services/alert-data.js';
 import { parseAlertQuery } from '../validation/alert-query.js';
+import { buildRewardSeries, groupRewardDays, rewardWindow } from '../services/alert-rewards.js';
 
 const records = [
     { _id: 'a', date: '12/31/25', vbucks: 30, powerLevel: 15, zone: { name: ' Stonewood ', mission: ' Misión de evacuación ', variant: ' Forest ' } },
@@ -29,6 +30,7 @@ async function withApi(repository, run) {
 }
 
 const repository = {
+    getRewards: async (period) => buildRewardSeries(groupRewardDays(alerts), rewardWindow(period, new Date('2026-01-02T15:00:00Z'))),
     getHistory: async (filters) => buildHistory(alerts, filters),
     getLatest: async () => buildLatest(alerts, [{ lastUpdated: '01/02/2026' }]),
 };
@@ -157,12 +159,33 @@ test('HTTP endpoints expose the versioned contract and reject invalid requests b
 
 test('database and log failures return JSON 500 without leaking internal details', async (t) => {
     t.mock.method(console, 'error', () => {});
-    for (const failed of ['getHistory', 'getLatest']) {
+    for (const failed of ['getHistory', 'getLatest', 'getRewards']) {
         await withApi({ ...repository, [failed]: async () => { throw new Error('private connection details'); } }, async (request) => {
-            const result = await request(failed === 'getLatest' ? '/latest' : '');
+            const result = await request(failed === 'getLatest' ? '/latest' : failed === 'getRewards' ? '/rewards' : '');
             assert.equal(result.status, 500);
             assert.equal(result.body.error.code, 'INTERNAL_ERROR');
             assert.doesNotMatch(JSON.stringify(result.body), /private/);
         });
     }
+});
+
+test('chart HTTP periods are independent and invalid requests do not read the database', async () => {
+    let reads = 0;
+    await withApi({ ...repository, getRewards: async (period) => { reads++; return repository.getRewards(period); } }, async (request) => {
+        const defaultChart = await request('/rewards');
+        assert.equal(defaultChart.status, 200);
+        assert.equal(defaultChart.body.period, '1m');
+        for (const period of ['7d', '1m', '6m', '1y']) {
+            const result = await request(`/rewards?period=${period}`);
+            assert.equal(result.status, 200);
+            assert.equal(result.body.period, period);
+        }
+        const before = reads;
+        for (const query of ['period=invalid', 'period=', 'period=7d&period=1m', 'period[x]=7d', 'page=2', 'from=2026-01-01']) {
+            const invalid = await request(`/rewards?${query}`);
+            assert.equal(invalid.status, 400, query);
+            assert.equal(invalid.body.error.code, 'INVALID_QUERY');
+        }
+        assert.equal(reads, before);
+    });
 });

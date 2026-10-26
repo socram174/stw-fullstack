@@ -25,6 +25,28 @@ neither alerts nor collection logs exist. Its date comes from the newest stored
 alert or log, independent of insertion order and the server's current date.
 A known rotation may have an empty `data` array and zero rewards.
 
+### `GET /api/v1/alerts/rewards`
+
+Independent chart data across all zones, without table filters or pagination.
+The only parameter is `period`, defaulting to `1m`:
+
+| Period | Inclusive window ending today | Bars |
+| --- | --- | --- |
+| `7d` | Last 7 calendar days | Daily |
+| `1m` | Last 30 calendar days | Daily |
+| `6m` | Last 6 months | Weekly, starting Monday |
+| `1y` | Last year | Monthly |
+
+Today is determined in `America/Santiago`. Month/year windows clamp month-end
+dates; the first and last week/month are clipped to the selected window.
+Returns `{ period, interval, from, to, data }`. Each data point contains
+`date`, `endDate`, `vbucks`, `missions`, `recordedDays` and `totalDays`.
+Missing periods have `vbucks: null`; recorded zero-reward days have `vbucks: 0`.
+Weekly/monthly totals include only recorded days, with coverage counts to
+identify incomplete totals. MongoDB aggregates the selected dates before
+grouping into chart buckets; no new documents or indexes are required.
+Unknown, repeated or unsupported parameters return `400`.
+
 ### `GET /api/v1/alerts`
 
 Example: `/api/v1/alerts?from=2026-10-01&to=2026-10-31&sort=recent&page=1&limit=15`

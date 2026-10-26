@@ -4,6 +4,7 @@ import { filterAlerts, getZones } from "../src/features/alerts/lib/alerts.ts"
 import {
   parseHistoryResponse,
   parseLatestResponse,
+  parseRewardsResponse,
 } from "../src/features/alerts/api/alert-response.ts"
 
 const alerts = [
@@ -154,4 +155,58 @@ test("zero-reward placeholders do not create a daily zone option", () => {
     ]),
     ["Canny Valley", "Plankerton", "Stonewood"]
   )
+})
+
+test("chart API preserves missing days, confirmed zero rewards and partial totals", () => {
+  const response = {
+    period: "7d",
+    interval: "day",
+    from: "2026-10-19",
+    to: "2026-10-25",
+    data: [
+      {
+        date: "2026-10-19",
+        endDate: "2026-10-19",
+        vbucks: 0,
+        missions: 0,
+        recordedDays: 1,
+        totalDays: 1,
+      },
+      {
+        date: "2026-10-20",
+        endDate: "2026-10-20",
+        vbucks: null,
+        missions: 0,
+        recordedDays: 0,
+        totalDays: 1,
+      },
+    ],
+  }
+  assert.deepEqual(parseRewardsResponse(response), response)
+  const partial = {
+    ...response,
+    period: "6m",
+    interval: "week",
+    data: [
+      {
+        date: "2026-10-19",
+        endDate: "2026-10-25",
+        vbucks: 50,
+        missions: 1,
+        recordedDays: 3,
+        totalDays: 7,
+      },
+    ],
+  }
+  assert.deepEqual(parseRewardsResponse(partial), partial)
+  for (const invalid of [
+    { ...response, period: "all" },
+    { ...response, interval: "year" },
+    { ...response, from: "2026-02-30" },
+    { ...response, data: [{ ...response.data[1], vbucks: 0 }] },
+    { ...response, data: [{ ...response.data[0], vbucks: null }] },
+    { ...partial, data: [{ ...partial.data[0], recordedDays: 8 }] },
+    { ...partial, data: [{ ...partial.data[0], endDate: "2027-01-01" }] },
+  ])
+    assert.throws(() => parseRewardsResponse(invalid))
 })

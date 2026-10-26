@@ -23,6 +23,25 @@ export interface DailyReward {
   missions: number
 }
 
+export type RewardPeriod = "7d" | "1m" | "6m" | "1y"
+
+export interface RewardBucket {
+  date: string
+  endDate: string
+  vbucks: number | null
+  missions: number
+  recordedDays: number
+  totalDays: number
+}
+
+export interface AlertRewardsResponse {
+  period: RewardPeriod
+  interval: "day" | "week" | "month"
+  from: string
+  to: string
+  data: RewardBucket[]
+}
+
 export interface AlertSummary {
   totalVbucks: number
   missions: number
