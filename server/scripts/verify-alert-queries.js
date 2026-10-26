@@ -56,14 +56,19 @@ try {
         const logs = await mongoose.connection.db.collection('logs').find().toArray();
         assert.deepEqual(await repository.getLatest(), buildLatest(normalizeAlerts(records), logs));
         const now = new Date();
-        for (const period of ['7d', '1m', '6m', '1y']) {
+        for (const period of ['7d', '1m', '6m', '1y', 'all']) {
             assert.deepEqual(await repository.getRewards(period, now), buildRewardSeries(groupRewardDays(normalizeAlerts(records)), rewardWindow(period, now)), `Rewards: ${period}`);
         }
+        const allTime = await repository.getRewards('all', now);
+        const summary = buildHistory(normalizeAlerts(records), parseAlertQuery({})).summary;
+        assert.equal(allTime.data.reduce((total, bucket) => total + (bucket.vbucks ?? 0), 0), summary.totalVbucks);
+        assert.equal(allTime.data.reduce((total, bucket) => total + bucket.missions, 0), summary.missions);
+        assert.equal(allTime.data.reduce((total, bucket) => total + bucket.recordedDays, 0), summary.days);
         const explanation = await collection.find({ date: { $gte: chartStartDate, $lte: latestDate } })
             .sort({ date: -1, vbucks: -1, _id: 1 }).limit(15).explain('queryPlanner');
         const plan = JSON.stringify(explanation.queryPlanner.winningPlan);
         assert.ok(plan.includes('alerts_date_reward_id'), 'Expected date index was not selected');
-        console.log(JSON.stringify({ mode: 'repository', rewardQueries: 4, historyQueries: queries.length + 1, latestVerified: true, documents: records.length, totalVbucks: buildHistory(normalizeAlerts(records), parseAlertQuery({})).summary.totalVbucks, dateIndexUsed: true, writes: 0 }));
+        console.log(JSON.stringify({ mode: 'repository', rewardQueries: 5, allTimeTotalsVerified: true, historyQueries: queries.length + 1, latestVerified: true, documents: records.length, totalVbucks: summary.totalVbucks, dateIndexUsed: true, writes: 0 }));
     }
 } catch (error) {
     console.error(error.name, error.message.replace(/mongodb(?:\+srv)?:\/\/[^\s]+/g, '[redacted connection]'));

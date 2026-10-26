@@ -20,7 +20,7 @@ export function createAlertRepository(AlertModel = Alert, LogModel = Log) {
                 days = groupRewardDays(normalizeAlerts(await findAlerts()));
             } else {
                 days = await AlertModel.aggregate([
-                    { $match: { date: { $gte: window.from, $lte: window.to } } },
+                    ...(period === 'all' ? [] : [{ $match: { date: { $gte: window.from, $lte: window.to } } }]),
                     { $group: {
                         _id: '$date', vbucks: { $sum: '$vbucks' },
                         missions: { $sum: { $cond: [{ $gt: ['$vbucks', 0] }, 1, 0] } },

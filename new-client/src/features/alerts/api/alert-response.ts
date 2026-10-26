@@ -111,7 +111,7 @@ export function parseHistoryResponse(value: unknown): AlertHistoryResponse {
 export function parseRewardsResponse(value: unknown): AlertRewardsResponse {
   if (
     !record(value) ||
-    !["7d", "1m", "6m", "1y"].includes(String(value.period)) ||
+    !["7d", "1m", "6m", "1y", "all"].includes(String(value.period)) ||
     !["day", "week", "month"].includes(String(value.interval)) ||
     !date(value.from) ||
     !date(value.to) ||

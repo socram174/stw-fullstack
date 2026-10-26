@@ -1,10 +1,9 @@
-import { CalendarDays, Coins, Crosshair, RefreshCw } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import { useState } from "react"
 import { useSearchParams } from "react-router"
 import { Button } from "@/components/ui/button"
 import { FeedbackState } from "@/components/shared/feedback-state"
 import { PageHeading } from "@/components/shared/page-heading"
-import { StatCard } from "@/components/shared/stat-card"
 import { AlertsSkeleton } from "@/features/alerts/components/alerts-skeleton"
 import {
   useAlertHistory,
@@ -20,7 +19,6 @@ import {
   HistoryTable,
 } from "@/features/history/components/history-table"
 import { RewardChart } from "@/features/history/components/reward-chart"
-import { formatNumber } from "@/lib/format"
 
 export default function HistoryPage() {
   const [chartPeriod, setChartPeriod] = useState<RewardPeriod>("1m")
@@ -44,7 +42,6 @@ export default function HistoryPage() {
     if (value) query.set(key, value)
   }
   const { data: response, status, refetch } = useAlertHistory(query.toString())
-  const stats = response?.summary
   const total = response?.pagination.total ?? 0
   const hasFilters = Boolean(search || zone || from || to || sort !== "recent")
   const loading = status === "loading"
@@ -89,7 +86,7 @@ export default function HistoryPage() {
             Every rotation, <span className="text-primary">at a glance.</span>
           </>
         }
-        description="Explore past missions and their rewards. Filter by date or zone to browse the archive."
+        description="Review reward trends by period, then search the mission archive below."
       >
         <Button
           variant="outline"
@@ -107,42 +104,6 @@ export default function HistoryPage() {
         </Button>
       </PageHeading>
 
-      <HistoryFilters
-        key={JSON.stringify([search, zone, sort, from, to])}
-        value={{ search, zone, sort, from, to }}
-        zones={response?.zones ?? []}
-        disabled={loading}
-        loading={loading}
-        error={status === "error"}
-        resultCount={total}
-        onApply={updateFilters}
-        onClear={() => setParams({}, { replace: true })}
-      />
-
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <StatCard
-          label="V-Bucks recorded"
-          value={stats ? formatNumber(stats.totalVbucks) : "—"}
-          description="Rewards in the current selection"
-          icon={Coins}
-          loading={loading}
-        />
-        <StatCard
-          label="V-Buck missions"
-          value={stats ? formatNumber(stats.missions) : "—"}
-          description="Excluding days with no rewards"
-          icon={Crosshair}
-          loading={loading}
-        />
-        <StatCard
-          label="Days recorded"
-          value={stats ? formatNumber(stats.days) : "—"}
-          description="Recorded dates in this selection"
-          icon={CalendarDays}
-          loading={loading}
-        />
-      </div>
-
       <RewardChart
         period={chartPeriod}
         onPeriodChange={setChartPeriod}
@@ -151,65 +112,73 @@ export default function HistoryPage() {
         onRetry={chart.refetch}
       />
 
-      {loading && <AlertsSkeleton />}
-      {status === "error" && (
-        <FeedbackState
-          error
-          title="Unable to load history"
-          description="Records are temporarily unavailable. Try again in a moment."
-        >
-          <Button variant="outline" onClick={refetch}>
-            Try again
-          </Button>
-        </FeedbackState>
-      )}
-      {ready && total === 0 && (
-        <FeedbackState
-          title={
-            hasFilters
-              ? "No records match these filters"
-              : "No history available yet"
-          }
-          description={
-            hasFilters
-              ? "Try different dates, another zone or a broader search."
-              : "Alerts will appear here as new rotations are recorded."
-          }
-        >
-          {hasFilters && (
-            <Button
-              variant="outline"
-              onClick={() => setParams({}, { replace: true })}
-            >
-              Clear filters
+      <section aria-labelledby="history-heading" className="space-y-4">
+        <div>
+          <h2
+            id="history-heading"
+            className="text-xl font-semibold tracking-tight"
+          >
+            Mission archive
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            These filters apply to the table. Days without V-Buck missions are
+            kept as zero-reward records.
+          </p>
+        </div>
+        <HistoryFilters
+          key={JSON.stringify([search, zone, sort, from, to])}
+          value={{ search, zone, sort, from, to }}
+          zones={response?.zones ?? []}
+          disabled={loading}
+          loading={loading}
+          error={status === "error"}
+          resultCount={total}
+          onApply={updateFilters}
+          onClear={() => setParams({}, { replace: true })}
+        />
+        {loading && <AlertsSkeleton />}
+        {status === "error" && (
+          <FeedbackState
+            error
+            title="Unable to load history"
+            description="Records are temporarily unavailable. Try again in a moment."
+          >
+            <Button variant="outline" onClick={refetch}>
+              Try again
             </Button>
-          )}
-        </FeedbackState>
-      )}
-      {ready && response && total > 0 && (
-        <>
-          <section aria-labelledby="history-heading" className="space-y-4">
-            <div>
-              <h2
-                id="history-heading"
-                className="text-xl font-semibold tracking-tight"
+          </FeedbackState>
+        )}
+        {ready && total === 0 && (
+          <FeedbackState
+            title={
+              hasFilters
+                ? "No records match these filters"
+                : "No history available yet"
+            }
+            description={
+              hasFilters
+                ? "Try different dates, another zone or a broader search."
+                : "Alerts will appear here as new rotations are recorded."
+            }
+          >
+            {hasFilters && (
+              <Button
+                variant="outline"
+                onClick={() => setParams({}, { replace: true })}
               >
-                All alerts
-              </h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Days without V-Buck missions are kept as zero-reward records.
-              </p>
-            </div>
-            <HistoryTable
-              alerts={response.data}
-              pagination={response.pagination}
-              onPageChange={(next) =>
-                updateParams({ page: String(next) }, false)
-              }
-            />
-          </section>
-        </>
-      )}
+                Clear filters
+              </Button>
+            )}
+          </FeedbackState>
+        )}
+        {ready && response && total > 0 && (
+          <HistoryTable
+            alerts={response.data}
+            pagination={response.pagination}
+            onPageChange={(next) => updateParams({ page: String(next) }, false)}
+          />
+        )}
+      </section>
     </div>
   )
 }

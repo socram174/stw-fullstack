@@ -7,12 +7,14 @@ import type {
   RewardPeriod,
 } from "@/features/alerts/types"
 import { RewardBars } from "./reward-bars"
+import { RewardSummary } from "./reward-summary"
 
 const periods: { value: RewardPeriod; label: string; description: string }[] = [
   { value: "7d", label: "7D", description: "Last 7 days" },
   { value: "1m", label: "1M", description: "Last 30 days" },
   { value: "6m", label: "6M", description: "Last 6 months" },
   { value: "1y", label: "1Y", description: "Last year" },
+  { value: "all", label: "All time", description: "All time" },
 ]
 
 interface RewardChartProps {
@@ -32,7 +34,11 @@ export function RewardChart({
 }: RewardChartProps) {
   const hasRecords = response?.data.some((bucket) => bucket.recordedDays > 0)
   const interval =
-    period === "6m" ? "Weekly" : period === "1y" ? "Monthly" : "Daily"
+    period === "6m"
+      ? "Weekly"
+      : period === "1y" || period === "all"
+        ? "Monthly"
+        : "Daily"
 
   return (
     <section
@@ -46,7 +52,9 @@ export function RewardChart({
             V-Buck rewards
           </h2>
           <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-            {interval} totals across all zones. Independent of table filters.
+            {period === "all"
+              ? "Monthly rewards and totals across all recorded history."
+              : `${interval} rewards and totals across all zones for this period.`}
           </p>
         </div>
         <ToggleGroup
@@ -66,13 +74,18 @@ export function RewardChart({
               value={item.value}
               aria-label={item.description}
               title={item.description}
-              className="min-w-11 data-pressed:bg-primary data-pressed:text-primary-foreground"
+              className="min-w-10 data-pressed:bg-primary data-pressed:text-primary-foreground sm:min-w-11"
             >
               {item.label}
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
       </div>
+
+      <RewardSummary
+        buckets={response?.data ?? null}
+        loading={status === "loading"}
+      />
 
       {status === "loading" && (
         <Skeleton className="h-56 w-full" aria-label="Loading rewards chart" />

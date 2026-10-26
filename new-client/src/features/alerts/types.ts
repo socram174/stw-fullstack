@@ -23,7 +23,7 @@ export interface DailyReward {
   missions: number
 }
 
-export type RewardPeriod = "7d" | "1m" | "6m" | "1y"
+export type RewardPeriod = "7d" | "1m" | "6m" | "1y" | "all"
 
 export interface RewardBucket {
   date: string

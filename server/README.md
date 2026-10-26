@@ -30,15 +30,19 @@ A known rotation may have an empty `data` array and zero rewards.
 Independent chart data across all zones, without table filters or pagination.
 The only parameter is `period`, defaulting to `1m`:
 
-| Period | Inclusive window ending today | Bars |
+| Period | Inclusive window | Bars |
 | --- | --- | --- |
 | `7d` | Last 7 calendar days | Daily |
 | `1m` | Last 30 calendar days | Daily |
 | `6m` | Last 6 months | Weekly, starting Monday |
 | `1y` | Last year | Monthly |
+| `all` | First through last recorded date | Monthly |
 
 Today is determined in `America/Santiago`. Month/year windows clamp month-end
 dates; the first and last week/month are clipped to the selected window.
+`all` covers every stored alert, including records older than a year, and uses
+the first/last recorded dates as bounds. An empty archive uses today with no
+recorded rewards. The default period remains `1m`.
 Returns `{ period, interval, from, to, data }`. Each data point contains
 `date`, `endDate`, `vbucks`, `missions`, `recordedDays` and `totalDays`.
 Missing periods have `vbucks: null`; recorded zero-reward days have `vbucks: 0`.

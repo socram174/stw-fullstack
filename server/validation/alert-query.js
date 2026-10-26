@@ -7,8 +7,8 @@ export function parseRewardQuery(query) {
         throw new InvalidQuery('Only period is supported for reward charts.');
     }
     const period = query.period ?? '1m';
-    if (!['7d', '1m', '6m', '1y'].includes(period)) {
-        throw new InvalidQuery('period must be 7d, 1m, 6m or 1y.');
+    if (!['7d', '1m', '6m', '1y', 'all'].includes(period)) {
+        throw new InvalidQuery('period must be 7d, 1m, 6m, 1y or all.');
     }
     return period;
 }

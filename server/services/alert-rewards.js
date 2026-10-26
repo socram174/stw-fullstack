@@ -9,6 +9,8 @@ const santiagoDate = new Intl.DateTimeFormat('en-CA', {
 export function rewardWindow(period, now = new Date()) {
     const parts = Object.fromEntries(santiagoDate.formatToParts(now).map(({ type, value }) => [type, value]));
     const to = `${parts.year}-${parts.month}-${parts.day}`;
+    // The full archive's bounds are resolved from its aggregated dates below.
+    if (period === 'all') return { period, interval: 'month', from: to, to };
     const end = calendarDate(to);
     let start;
     if (period === '7d' || period === '1m') {
@@ -37,6 +39,10 @@ export function groupRewardDays(alerts) {
 }
 
 export function buildRewardSeries(days, window) {
+    if (window.period === 'all' && days.length) {
+        const dates = days.map((day) => day.date).sort();
+        window = { ...window, from: dates[0], to: dates[dates.length - 1] };
+    }
     const recorded = new Map(days.map((day) => [day.date, day]));
     const buckets = new Map();
     for (let cursor = calendarDate(window.from); iso(cursor) <= window.to; cursor = shiftDays(cursor, 1)) {

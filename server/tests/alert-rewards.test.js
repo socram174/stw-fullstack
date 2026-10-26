@@ -72,4 +72,34 @@ test('reward repository keeps the same chart for legacy dates and ISO aggregates
         aggregate: () => ({ exec: async () => groupRewardDays(normalizeAlerts(records)) }),
     });
     assert.deepEqual(await legacy.getRewards('7d', now), await iso.getRewards('7d', now));
+    assert.deepEqual(await legacy.getRewards('all', now), await iso.getRewards('all', now));
+});
+
+test('all-time rewards include the complete archive with monthly bars and preserve missing months', () => {
+    const days = groupRewardDays([
+        { date: '2026-10-25', vbucks: 50 },
+        { date: '2022-11-27', vbucks: 0 },
+        { date: '2024-02-29', vbucks: 30 },
+        { date: '2024-02-29', vbucks: 40 },
+    ]);
+    const result = buildRewardSeries(days, rewardWindow('all', now));
+    assert.equal(result.from, '2022-11-27');
+    assert.equal(result.to, '2026-10-25');
+    assert.equal(result.interval, 'month');
+    assert.equal(result.data.length, 48);
+    assert.equal(result.data[0].vbucks, 0);
+    assert.equal(result.data[1].vbucks, null);
+    assert.deepEqual(result.data.find((bucket) => bucket.date === '2024-02-01'), {
+        date: '2024-02-01', endDate: '2024-02-29', vbucks: 70, missions: 2, recordedDays: 1, totalDays: 29,
+    });
+    assert.equal(result.data.reduce((total, bucket) => total + (bucket.vbucks ?? 0), 0), 120);
+    assert.equal(result.data.reduce((total, bucket) => total + bucket.missions, 0), 3);
+    assert.equal(result.data.reduce((total, bucket) => total + bucket.recordedDays, 0), 3);
+});
+
+test('an empty all-time archive returns an unknown total for today without inventing rewards', () => {
+    const result = buildRewardSeries([], rewardWindow('all', now));
+    assert.equal(result.from, '2026-10-25');
+    assert.equal(result.to, '2026-10-25');
+    assert.deepEqual(result.data, [{ date: '2026-10-25', endDate: '2026-10-25', vbucks: null, missions: 0, recordedDays: 0, totalDays: 1 }]);
 });

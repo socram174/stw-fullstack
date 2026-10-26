@@ -175,7 +175,7 @@ test('chart HTTP periods are independent and invalid requests do not read the da
         const defaultChart = await request('/rewards');
         assert.equal(defaultChart.status, 200);
         assert.equal(defaultChart.body.period, '1m');
-        for (const period of ['7d', '1m', '6m', '1y']) {
+        for (const period of ['7d', '1m', '6m', '1y', 'all']) {
             const result = await request(`/rewards?period=${period}`);
             assert.equal(result.status, 200);
             assert.equal(result.body.period, period);

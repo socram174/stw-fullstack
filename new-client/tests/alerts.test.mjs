@@ -1,6 +1,7 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
 import { filterAlerts, getZones } from "../src/features/alerts/lib/alerts.ts"
+import { summarizeRewardBuckets } from "../src/features/history/lib/reward-summary.ts"
 import {
   parseHistoryResponse,
   parseLatestResponse,
@@ -183,6 +184,11 @@ test("chart API preserves missing days, confirmed zero rewards and partial total
     ],
   }
   assert.deepEqual(parseRewardsResponse(response), response)
+  assert.deepEqual(summarizeRewardBuckets(response.data), {
+    totalVbucks: 0,
+    missions: 0,
+    days: 1,
+  })
   const partial = {
     ...response,
     period: "6m",
@@ -199,8 +205,20 @@ test("chart API preserves missing days, confirmed zero rewards and partial total
     ],
   }
   assert.deepEqual(parseRewardsResponse(partial), partial)
+  assert.deepEqual(summarizeRewardBuckets(partial.data), {
+    totalVbucks: 50,
+    missions: 1,
+    days: 3,
+  })
+  const allTime = { ...partial, period: "all", interval: "month" }
+  assert.deepEqual(parseRewardsResponse(allTime), allTime)
+  assert.deepEqual(summarizeRewardBuckets(allTime.data), {
+    totalVbucks: 50,
+    missions: 1,
+    days: 3,
+  })
   for (const invalid of [
-    { ...response, period: "all" },
+    { ...response, period: "invalid" },
     { ...response, interval: "year" },
     { ...response, from: "2026-02-30" },
     { ...response, data: [{ ...response.data[1], vbucks: 0 }] },
