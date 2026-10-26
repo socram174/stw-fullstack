@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { buildRewardSeries, groupRewardDays, rewardWindow } from '../services/alert-rewards.js';
-import { normalizeAlerts } from '../services/alert-data.js';
 import { createAlertRepository } from '../repositories/alerts.js';
 
 const now = new Date('2026-10-26T01:00:00Z');
@@ -61,18 +60,16 @@ test('yearly chart groups by calendar month and preserves missing months', () =>
     assert.equal(result.data.reduce((sum, bucket) => sum + bucket.totalDays, 0), 365);
 });
 
-test('reward repository keeps the same chart for legacy dates and ISO aggregates', async () => {
-    const records = [ { date: '10/19/26', vbucks: 50 }, { date: '10/20/2026', vbucks: 0 } ];
-    const legacy = createAlertRepository({
-        exists: async () => ({ _id: 'legacy' }),
-        find: () => ({ select() { return this; }, lean() { return this; }, exec: async () => records }),
+test('reward repository directly aggregates ISO dates without checking legacy documents', async () => {
+    const days = groupRewardDays([{ date: '2026-10-19', vbucks: 50 }, { date: '2026-10-20', vbucks: 0 }]);
+    const repository = createAlertRepository({
+        exists: () => { throw new Error('Do not query legacy dates'); },
+        find: () => { throw new Error('Do not load the full archive'); },
+        aggregate: () => ({ exec: async () => days }),
     });
-    const iso = createAlertRepository({
-        exists: async () => null,
-        aggregate: () => ({ exec: async () => groupRewardDays(normalizeAlerts(records)) }),
-    });
-    assert.deepEqual(await legacy.getRewards('7d', now), await iso.getRewards('7d', now));
-    assert.deepEqual(await legacy.getRewards('all', now), await iso.getRewards('all', now));
+    for (const period of ['7d', 'all']) {
+        assert.deepEqual(await repository.getRewards(period, now), buildRewardSeries(days, rewardWindow(period, now)));
+    }
 });
 
 test('all-time rewards include the complete archive with monthly bars and preserve missing months', () => {

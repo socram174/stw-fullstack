@@ -1,13 +1,11 @@
-// Accept legacy dates during migration/rolling deployment. New collector writes
-// ISO calendar dates; nested zone fields remain compatible with old clients.
+// API dates are ISO calendar strings. Legacy conversion belongs to migration tools.
 export function parseAlertDate(value) {
     if (typeof value !== 'string') throw new Error('Invalid stored alert date.');
-    const legacy = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/.exec(value);
     const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-    const rawYear = legacy?.[3] ?? iso?.[1];
-    const year = Number(rawYear) + (rawYear?.length === 2 ? 2000 : 0);
-    const month = Number(legacy?.[1] ?? iso?.[2]);
-    const day = Number(legacy?.[2] ?? iso?.[3]);
+    if (!iso) throw new Error('Invalid stored alert date.');
+    const year = Number(iso[1]);
+    const month = Number(iso[2]);
+    const day = Number(iso[3]);
     const date = new Date(Date.UTC(year, month - 1, day));
     if (!Number.isFinite(date.getTime()) || date.getUTCFullYear() !== year ||
         date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {

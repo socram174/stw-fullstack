@@ -8,6 +8,7 @@ import { buildHistory, buildLatest, normalizeAlerts, parseAlertDate } from '../s
 import { historyFacet, historySelection } from '../services/alert-pipeline.js';
 import { parseAlertQuery } from '../validation/alert-query.js';
 import { buildRewardSeries, groupRewardDays, rewardWindow } from '../services/alert-rewards.js';
+import { parseMigrationDate } from '../migrations/alert-dates.js';
 
 dotenv.config({ path: fileURLToPath(new URL('../.env', import.meta.url)) });
 const preflight = process.argv.includes('--preflight');
@@ -17,7 +18,8 @@ try {
     const collection = mongoose.connection.db.collection('alerts');
     const records = await collection.find().toArray();
     assert.ok(records.length > 0, 'No alerts to verify');
-    const dates = normalizeAlerts(records).map((row) => row.date).sort();
+    const source = preflight ? records.map((row) => ({ ...row, date: parseMigrationDate(row.date) })) : records;
+    const dates = normalizeAlerts(source).map((row) => row.date).sort();
     const latestDate = dates[dates.length - 1];
     const chartStartDate = dates.slice(-30)[0];
     const queries = [
@@ -29,7 +31,7 @@ try {
     ];
     if (preflight) {
         const fixtures = [
-            ...records.map((row) => ({ ...row, date: parseAlertDate(row.date) })),
+            ...source,
             { _id: 'fixture-accent', date: '2025-01-01', vbucks: 50, zone: { name: ' New zone ', mission: ' Misión de evacuación ' } },
             { _id: 'fixture-zero', date: '2025-01-02', vbucks: 0, zone: 0 },
         ];

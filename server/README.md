@@ -97,8 +97,8 @@ Both endpoints return alerts with the same shape:
 }
 ```
 
-Strings are trimmed; legacy `MM/DD/YY` and `MM/DD/YYYY` dates are normalized to
-ISO dates without timezone conversion. Two-digit years refer to the 2000s.
+Strings are trimmed. Alert dates and collection log dates must already be valid
+ISO calendar strings (`YYYY-MM-DD`); API requests do not convert legacy dates.
 Zero-reward placeholders remain in history but do not count as missions.
 Unknown power levels are `0`; `minPower` excludes these. Unknown zones use
 `Unknown zone` and do not inflate the summary zone count.
@@ -129,10 +129,9 @@ sorting, pagination, totals and daily rewards run in MongoDB. The repository
 returns only the requested page, aggregates and zone options. The compound
 `alerts_date_reward_id` index supports date ranges and recent-date ordering.
 
-During rolling deployments, if legacy alert dates are detected, the repository
-temporarily uses the previous normalization/filtering path. This keeps the API
-usable if an older deployed collector writes another legacy date. Publish the
-updated collector in the separate `STWalerts` repository to finish the transition.
+Versioned endpoints query the ISO data directly, without checking for legacy
+dates or loading the archive into Node.js as a fallback. Legacy date conversion
+is confined to the explicit migration tools below.
 
 ## Date migration
 

@@ -1,13 +1,20 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ObjectId } from 'bson';
-import { planDateMigration, snapshotSummary, verifyDateMigration } from '../migrations/alert-dates.js';
+import { parseMigrationDate, planDateMigration, snapshotSummary, verifyDateMigration } from '../migrations/alert-dates.js';
 import { literalSearchPattern } from '../services/alert-pipeline.js';
 
 const old = [
     { _id: new ObjectId(), date: '12/31/25', vbucks: 30, zone: { name: ' Stonewood' } },
     { _id: new ObjectId(), date: '01/01/2026', vbucks: 0, afterReset: true },
 ];
+
+test('migration tools alone convert legacy dates and still reject invalid calendar dates', () => {
+    for (const [input, expected] of [['11/27/22', '2022-11-27'], ['1/1/2026', '2026-01-01'], ['02/29/2024', '2024-02-29'], ['2024-02-29', '2024-02-29']]) {
+        assert.equal(parseMigrationDate(input), expected);
+    }
+    for (const input of ['02/29/2025', '02/30/2024', '13/01/2026', '2026-04-31', '', null]) assert.throws(() => parseMigrationDate(input));
+});
 
 test('migration only sets dates and guards against concurrent changes', () => {
     const plan = planDateMigration(old, 'date');

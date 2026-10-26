@@ -1,37 +1,27 @@
 import Alert from '../models/Alert.js';
 import Log from '../models/Log.js';
-import { buildHistory, buildLatest, normalizeAlerts, parseAlertDate } from '../services/alert-data.js';
+import { buildLatest, normalizeAlerts, parseAlertDate } from '../services/alert-data.js';
 import { historyFacet, historySelection, historySort, normalizedAlertStage } from '../services/alert-pipeline.js';
-import { buildRewardSeries, groupRewardDays, rewardWindow } from '../services/alert-rewards.js';
+import { buildRewardSeries, rewardWindow } from '../services/alert-rewards.js';
 
-const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 const emptySummary = { totalVbucks: 0, missions: 0, zones: 0, minPower: null, days: 0 };
 
 export function createAlertRepository(AlertModel = Alert, LogModel = Log) {
-    const findAlerts = () => AlertModel.find().select('date powerLevel vbucks zone afterReset').lean().exec();
     const findLogs = () => LogModel.find().select('lastUpdated afterReset').lean().exec();
-    // Keep rolling deployments safe until the external collector is published.
-    const hasLegacyDates = async () => Boolean(await AlertModel.exists({ date: { $not: isoDate } }));
     return {
         async getRewards(period, now) {
             const window = rewardWindow(period, now);
-            let days;
-            if (await hasLegacyDates()) {
-                days = groupRewardDays(normalizeAlerts(await findAlerts()));
-            } else {
-                days = await AlertModel.aggregate([
-                    ...(period === 'all' ? [] : [{ $match: { date: { $gte: window.from, $lte: window.to } } }]),
-                    { $group: {
-                        _id: '$date', vbucks: { $sum: '$vbucks' },
-                        missions: { $sum: { $cond: [{ $gt: ['$vbucks', 0] }, 1, 0] } },
-                    } },
-                    { $project: { _id: 0, date: '$_id', vbucks: 1, missions: 1 } },
-                ]).exec();
-            }
+            const days = await AlertModel.aggregate([
+                ...(period === 'all' ? [] : [{ $match: { date: { $gte: window.from, $lte: window.to } } }]),
+                { $group: {
+                    _id: '$date', vbucks: { $sum: '$vbucks' },
+                    missions: { $sum: { $cond: [{ $gt: ['$vbucks', 0] }, 1, 0] } },
+                } },
+                { $project: { _id: 0, date: '$_id', vbucks: 1, missions: 1 } },
+            ]).exec();
             return buildRewardSeries(days, window);
         },
         async getHistory(filters) {
-            if (await hasLegacyDates()) return buildHistory(normalizeAlerts(await findAlerts()), filters);
             const [result, zoneRows] = await Promise.all([
                 AlertModel.aggregate([...historySelection(filters), historyFacet(filters)]).exec(),
                 AlertModel.aggregate([
@@ -56,10 +46,6 @@ export function createAlertRepository(AlertModel = Alert, LogModel = Log) {
             };
         },
         async getLatest() {
-            if (await hasLegacyDates()) {
-                const [records, logs] = await Promise.all([findAlerts(), findLogs()]);
-                return buildLatest(normalizeAlerts(records), logs);
-            }
             const [newest, logs] = await Promise.all([
                 AlertModel.findOne().sort({ date: -1, vbucks: -1, _id: 1 }).select('date').lean().exec(),
                 findLogs(),

@@ -8,10 +8,10 @@ import { parseAlertQuery } from '../validation/alert-query.js';
 import { buildRewardSeries, groupRewardDays, rewardWindow } from '../services/alert-rewards.js';
 
 const records = [
-    { _id: 'a', date: '12/31/25', vbucks: 30, powerLevel: 15, zone: { name: ' Stonewood ', mission: ' Misión de evacuación ', variant: ' Forest ' } },
-    { _id: 'b', date: '01/01/2026', vbucks: 40, powerLevel: 70, zone: { name: 'Canny Valley', mission: 'Repair the Shelter' }, afterReset: true },
+    { _id: 'a', date: '2025-12-31', vbucks: 30, powerLevel: 15, zone: { name: ' Stonewood ', mission: ' Misión de evacuación ', variant: ' Forest ' } },
+    { _id: 'b', date: '2026-01-01', vbucks: 40, powerLevel: 70, zone: { name: 'Canny Valley', mission: 'Repair the Shelter' }, afterReset: true },
     { _id: 'c', date: '2026-01-01', vbucks: 35, powerLevel: 28, zone: { name: 'Plankerton', mission: 'Retrieve the Data' } },
-    { _id: 'zero', date: '01/02/26', vbucks: 0, zone: 'N/A' },
+    { _id: 'zero', date: '2026-01-02', vbucks: 0, zone: 'N/A' },
 ];
 const alerts = normalizeAlerts(records);
 const history = (query = {}, data = alerts) => buildHistory(data, parseAlertQuery(query));
@@ -32,14 +32,15 @@ async function withApi(repository, run) {
 const repository = {
     getRewards: async (period) => buildRewardSeries(groupRewardDays(alerts), rewardWindow(period, new Date('2026-01-02T15:00:00Z'))),
     getHistory: async (filters) => buildHistory(alerts, filters),
-    getLatest: async () => buildLatest(alerts, [{ lastUpdated: '01/02/2026' }]),
+    getLatest: async () => buildLatest(alerts, [{ lastUpdated: '2026-01-02' }]),
 };
 
-test('legacy and ISO calendar dates normalize without timezone shifts', () => {
-    for (const [input, expected] of [['11/27/22', '2022-11-27'], ['1/1/2026', '2026-01-01'], ['2024-02-29', '2024-02-29']]) {
-        assert.equal(parseAlertDate(input), expected);
+test('API dates accept valid ISO calendar strings and reject legacy formats', () => {
+    for (const date of ['2022-11-27', '2026-01-01', '2024-02-29']) assert.equal(parseAlertDate(date), date);
+    for (const input of ['11/27/22', '1/1/2026', '02/29/2024', '2026-02-30', '2026-04-31', '', null]) {
+        assert.throws(() => parseAlertDate(input));
     }
-    for (const input of ['02/29/2025', '02/30/2024', '13/01/2026', '2026-04-31', '', null]) assert.throws(() => parseAlertDate(input));
+    assert.throws(() => normalizeAlerts([{ date: '10/25/2026', vbucks: 50 }]));
 });
 
 test('normalization trims scraped strings and preserves IDs and reset flags', () => {
@@ -118,8 +119,8 @@ test('missing power levels and unknown zones do not affect minimum or zone count
     assert.equal(result.summary.zones, 1);
 });
 
-test('latest rotation uses normalized dates rather than log insertion order or today', () => {
-    const result = buildLatest(alerts, [{ lastUpdated: '12/31/25' }, { lastUpdated: '01/02/2026', afterReset: true }]);
+test('latest rotation uses ISO dates rather than log insertion order or today', () => {
+    const result = buildLatest(alerts, [{ lastUpdated: '2025-12-31' }, { lastUpdated: '2026-01-02', afterReset: true }]);
     assert.deepEqual(result.rotation, { date: '2026-01-02', afterReset: true });
     assert.equal(result.data[0].id, 'zero');
     assert.equal(result.summary.missions, 0);
@@ -129,7 +130,7 @@ test('latest rotation uses normalized dates rather than log insertion order or t
 
 test('latest keeps rotation metadata with no missions and supports an empty database', () => {
     assert.deepEqual(buildLatest([], []).rotation, null);
-    const result = buildLatest([], [{ lastUpdated: '01/02/26' }]);
+    const result = buildLatest([], [{ lastUpdated: '2026-01-02' }]);
     assert.deepEqual(result.data, []);
     assert.deepEqual(result.rotation, { date: '2026-01-02', afterReset: false });
     assert.equal(result.summary.totalVbucks, 0);

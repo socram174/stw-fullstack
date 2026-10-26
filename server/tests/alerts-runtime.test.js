@@ -11,11 +11,13 @@ function query(value) {
     };
 }
 
-function repository(records, logs, legacy = false) {
+function repository(records, logs) {
     return createAlertRepository({
-        exists: async () => legacy ? { _id: 'legacy' } : null,
         findOne: () => query(records[0] ?? null),
-        find: (filter) => query(filter ? records.filter((row) => row.date === filter.date) : records),
+        find: (filter) => {
+            assert.ok(filter?.date, 'Latest must only fetch alerts for its selected date');
+            return query(records.filter((row) => row.date === filter.date));
+        },
     }, { find: () => query(logs) });
 }
 
@@ -39,14 +41,11 @@ test('ISO latest alerts work without Array.prototype.at', async () => {
     assert.equal(result.data[0].id, 'a');
 });
 
-test('legacy latest alerts also work without Array.prototype.at', async () => {
+test('latest rejects a legacy log date instead of converting it at request time', async () => {
     const repo = repository([
-        { _id: 'a', date: '10/25/2026', vbucks: 50 },
-        { _id: 'b', date: '12/09/22', vbucks: 30 },
-    ], [{ lastUpdated: '10/25/2026' }], true);
-    const result = await withoutArrayAt(() => repo.getLatest());
-    assert.equal(result.rotation.date, '2026-10-25');
-    assert.equal(result.summary.totalVbucks, 50);
+        { _id: 'a', date: '2026-10-25', vbucks: 50 },
+    ], [{ lastUpdated: '10/25/2026' }]);
+    await assert.rejects(repo.getLatest(), /Invalid stored alert date/);
 });
 
 test('missing alerts and logs work without Array.prototype.at', async () => {
