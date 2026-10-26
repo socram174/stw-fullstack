@@ -8,7 +8,6 @@ import morgan from 'morgan';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import alertRoutes from './routes/alerts.js';
-import mailRoutes from './routes/mail.js';
 import { createAlertRouter } from './routes/alerts-v1.js';
 import { alertRepository } from './repositories/alerts.js';
 
@@ -29,7 +28,6 @@ app.use(bodyParser.urlencoded({limit: "30mb",extended:true}));
 /* ROUTES */
 app.use('/alerts',alertRoutes);
 app.use('/api/v1/alerts', createAlertRouter(alertRepository));
-app.use('/mail',mailRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001;

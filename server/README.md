@@ -91,7 +91,6 @@ details. Unknown versioned alert routes return `404`. Error bodies use:
 
 `GET /alerts` and `POST /alerts/update` remain available with their original
 array response for older clients. New clients should use `/api/v1/alerts`.
-Email routes and controllers are unchanged.
 
 Dates are stored as ISO calendar strings, using the collector's existing
 `America/Santiago` day without shifting historical dates. Date range filtering,
