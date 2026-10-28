@@ -1,5 +1,8 @@
 # Alerts API
 
+Optional owner-only MCP access is documented in [Private MCP access](auth/README.md).
+It uses Better Auth and is disabled until explicitly configured.
+
 Use Node.js 24.x, matching the frontend. Run `npm install` and `npm start` from `server/`. The existing `MONGO_URL`
 and `PORT` environment variables still apply. Run `npm test` for unit, migration
 and HTTP contract tests; these do not connect to MongoDB.
