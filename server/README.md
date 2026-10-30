@@ -114,7 +114,7 @@ details. Unknown versioned alert routes return `404`. Error bodies use:
 { "error": { "code": "INVALID_QUERY", "message": "from must be a valid YYYY-MM-DD date." } }
 ```
 
-## Structure and compatibility
+## Structure
 
 - `routes/alerts-v1.js`: routes and errors scoped to this API.
 - `controllers/alerts-v1.js`: request orchestration.
@@ -122,9 +122,6 @@ details. Unknown versioned alert routes return `404`. Error bodies use:
 - `services/alert-data.js`: normalization, filtering, summaries and pagination.
 - `services/alert-pipeline.js`: MongoDB projections, filters and aggregate summaries.
 - `repositories/alerts.js`: read-only database access.
-
-`GET /alerts` and `POST /alerts/update` remain available with their original
-array response for older clients. New clients should use `/api/v1/alerts`.
 
 Dates are stored as ISO calendar strings, using the collector's existing
 `America/Santiago` day without shifting historical dates. Date range filtering,
@@ -166,6 +163,4 @@ before migration using normalized copies of the real records plus accent and
 zero-reward fixtures. It performs no writes. Default verification compares the
 actual repository with the original full-archive results after migration.
 
-Deploy the backend before the new frontend. The legacy routes let the previous
-frontend continue working during the transition. Restart an already running
-backend to load the new routes.
+Restart an already running backend to load route changes.
