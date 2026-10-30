@@ -15,14 +15,14 @@ type RequestState<T> = {
 
 function useAlertRequest<T>(
   key: string,
-  fetcher: (key: string, signal: AbortSignal) => Promise<T>
+  fetcher: (key: string, signal: AbortSignal, force: boolean) => Promise<T>
 ) {
   const [attempt, setAttempt] = useState(0)
   const [state, setState] = useState<RequestState<T> | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
-    fetcher(key, controller.signal).then(
+    fetcher(key, controller.signal, attempt > 0).then(
       (data) => {
         if (!controller.signal.aborted)
           setState({ key, attempt, status: "success", data })
@@ -44,14 +44,18 @@ function useAlertRequest<T>(
   }
 }
 
-const latest = (_key: string, signal: AbortSignal) => fetchLatestAlerts(signal)
+const latest = (_key: string, signal: AbortSignal, force: boolean) =>
+  fetchLatestAlerts(signal, force)
 
 export function useLatestAlerts() {
   return useAlertRequest("latest", latest)
 }
 
+const history = (query: string, signal: AbortSignal) =>
+  fetchAlertHistory(query, signal)
+
 export function useAlertHistory(query: string) {
-  return useAlertRequest(query, fetchAlertHistory)
+  return useAlertRequest(query, history)
 }
 
 const rewards = (period: string, signal: AbortSignal) =>
