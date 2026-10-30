@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import alertRoutes from './routes/alerts.js';
 import { createAlertRouter } from './routes/alerts-v1.js';
 import { createMcpRouter } from './auth/routes.js';
 
@@ -23,7 +22,6 @@ export function createApp({ repository, auth = null, mcpConfig = null, logging =
     // Better Auth and the MCP transport must receive the unread request stream.
     if (auth && mcpConfig) app.use(createMcpRouter(auth, mcpConfig, repository));
     app.use(express.json());
-    app.use('/alerts', alertRoutes);
     app.use('/api/v1/alerts', createAlertRouter(repository));
     return app;
 }
