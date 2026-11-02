@@ -9,7 +9,7 @@ import {
   useAlertHistory,
   useAlertRewards,
 } from "@/features/alerts/hooks/use-alerts"
-import type { RewardPeriod } from "@/features/alerts/types"
+import type { RewardChartType, RewardPeriod } from "@/features/alerts/types"
 import {
   HistoryFilters,
   type HistoryFiltersValue,
@@ -22,7 +22,8 @@ import { RewardChart } from "@/features/history/components/reward-chart"
 
 export default function HistoryPage() {
   const [chartPeriod, setChartPeriod] = useState<RewardPeriod>("1m")
-  const chart = useAlertRewards(chartPeriod)
+  const [chartType, setChartType] = useState<RewardChartType>("bars")
+  const chart = useAlertRewards(chartPeriod, chartType)
   const [params, setParams] = useSearchParams()
   const search = params.get("q") ?? ""
   const zone = params.get("zone") ?? ""
@@ -105,6 +106,8 @@ export default function HistoryPage() {
       </PageHeading>
 
       <RewardChart
+        chartType={chartType}
+        onChartTypeChange={setChartType}
         period={chartPeriod}
         onPeriodChange={setChartPeriod}
         response={chart.data}

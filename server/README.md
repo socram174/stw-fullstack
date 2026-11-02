@@ -31,7 +31,7 @@ A known rotation may have an empty `data` array and zero rewards.
 ### `GET /api/v1/alerts/rewards`
 
 Independent chart data across all zones, without table filters or pagination.
-The only parameter is `period`, defaulting to `1m`:
+The `period` parameter defaults to `1m`:
 
 | Period | Inclusive window | Bars |
 | --- | --- | --- |
@@ -53,6 +53,12 @@ Weekly/monthly totals include only recorded days, with coverage counts to
 identify incomplete totals. MongoDB aggregates the selected dates before
 grouping into chart buckets; no new documents or indexes are required.
 Unknown, repeated or unsupported parameters return `400`.
+
+Pass `interval=day` to retrieve one bucket per calendar day for the heatmap,
+including `6m`, `1y` and `all`. The date window and totals remain the same;
+missing days have `vbucks: null`, while recorded zero-reward days have `vbucks: 0`.
+Omitting `interval` keeps the weekly/monthly aggregation above. Other interval
+values are rejected. For example: `/api/v1/alerts/rewards?period=1y&interval=day`.
 
 ### `GET /api/v1/alerts`
 

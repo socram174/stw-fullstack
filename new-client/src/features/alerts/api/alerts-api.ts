@@ -3,10 +3,7 @@ import { parseHistoryResponse, parseRewardsResponse } from "./alert-response"
 import { loadLatestAlerts } from "./latest-alerts-cache"
 import type { RewardPeriod } from "../types"
 
-export async function fetchLatestAlerts(
-  signal: AbortSignal,
-  force = false
-) {
+export async function fetchLatestAlerts(signal: AbortSignal, force = false) {
   return loadLatestAlerts({
     signal,
     force,
@@ -23,11 +20,16 @@ export async function fetchAlertHistory(query: string, signal: AbortSignal) {
 
 export async function fetchAlertRewards(
   period: RewardPeriod,
-  signal: AbortSignal
+  signal: AbortSignal,
+  interval?: "day"
 ) {
+  const query = new URLSearchParams({ period })
+  if (interval) query.set("interval", interval)
   const response = parseRewardsResponse(
-    await apiRequest(`/api/v1/alerts/rewards?period=${period}`, { signal })
+    await apiRequest(`/api/v1/alerts/rewards?${query}`, { signal })
   )
   if (response.period !== period) throw new Error("Unexpected rewards period.")
+  if (interval && response.interval !== interval)
+    throw new Error("Unexpected rewards interval.")
   return response
 }

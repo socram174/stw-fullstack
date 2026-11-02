@@ -4,7 +4,7 @@ import {
   fetchLatestAlerts,
   fetchAlertRewards,
 } from "../api/alerts-api"
-import type { RewardPeriod } from "../types"
+import type { RewardChartType, RewardPeriod } from "../types"
 
 type RequestState<T> = {
   key: string
@@ -58,9 +58,21 @@ export function useAlertHistory(query: string) {
   return useAlertRequest(query, history)
 }
 
-const rewards = (period: string, signal: AbortSignal) =>
-  fetchAlertRewards(period as RewardPeriod, signal)
+const rewards = (key: string, signal: AbortSignal) => {
+  const [period, interval] = key.split(":")
+  return fetchAlertRewards(
+    period as RewardPeriod,
+    signal,
+    interval === "day" ? "day" : undefined
+  )
+}
 
-export function useAlertRewards(period: RewardPeriod) {
-  return useAlertRequest(period, rewards)
+export function useAlertRewards(
+  period: RewardPeriod,
+  chartType: RewardChartType = "bars"
+) {
+  return useAlertRequest(
+    chartType === "heatmap" ? `${period}:day` : period,
+    rewards
+  )
 }

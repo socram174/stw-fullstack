@@ -3,7 +3,8 @@ import { parseAlertQuery, parseRewardQuery } from '../validation/alert-query.js'
 export function createAlertControllers(repository) {
     return {
         rewards: async (req, res) => {
-            res.json(await repository.getRewards(parseRewardQuery(req.query)));
+            const period = parseRewardQuery(req.query);
+            res.json(await repository.getRewards(period, undefined, req.query.interval));
         },
         history: async (req, res) => {
             const filters = parseAlertQuery(req.query);

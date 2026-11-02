@@ -100,3 +100,31 @@ test('an empty all-time archive returns an unknown total for today without inven
     assert.equal(result.to, '2026-10-25');
     assert.deepEqual(result.data, [{ date: '2026-10-25', endDate: '2026-10-25', vbucks: null, missions: 0, recordedDays: 0, totalDays: 1 }]);
 });
+
+test('daily heatmap data preserves the same window and totals as aggregated charts', async () => {
+    const days = groupRewardDays([
+        { date: '2022-11-27', vbucks: 0 },
+        { date: '2024-02-29', vbucks: 50 },
+        { date: '2026-10-25', vbucks: 100 },
+    ]);
+    const repository = createAlertRepository({ aggregate: (pipeline) => ({ exec: async () => {
+        const range = pipeline[0].$match?.date;
+        return range ? days.filter((day) => day.date >= range.$gte && day.date <= range.$lte) : days;
+    } }) });
+    for (const period of ['7d', '1m', '6m', '1y', 'all']) {
+        const bars = await repository.getRewards(period, now);
+        const calendar = await repository.getRewards(period, now, 'day');
+        assert.equal(calendar.interval, 'day');
+        assert.equal(calendar.from, bars.from);
+        assert.equal(calendar.to, bars.to);
+        for (const field of ['vbucks', 'missions', 'recordedDays', 'totalDays']) {
+            assert.equal(calendar.data.reduce((sum, day) => sum + (day[field] ?? 0), 0), bars.data.reduce((sum, bucket) => sum + (bucket[field] ?? 0), 0));
+        }
+        assert.ok(calendar.data.every((day) => day.date === day.endDate && day.totalDays === 1));
+        if (period === 'all') {
+            assert.equal(calendar.data.find((day) => day.date === '2024-02-29').vbucks, 50);
+            assert.equal(calendar.data[0].vbucks, 0);
+            assert.equal(calendar.data[1].vbucks, null);
+        }
+    }
+});

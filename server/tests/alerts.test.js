@@ -190,3 +190,26 @@ test('chart HTTP periods are independent and invalid requests do not read the da
         assert.equal(reads, before);
     });
 });
+
+test('daily chart requests validate the interval before reading and pass it to the repository', async () => {
+    let reads = 0;
+    await withApi({ ...repository, getRewards: async (period, now, interval) => {
+        reads++;
+        const window = rewardWindow(period, new Date('2026-01-02T15:00:00Z'));
+        if (interval) window.interval = interval;
+        return buildRewardSeries(groupRewardDays(alerts), window);
+    } }, async (request) => {
+        for (const period of ['7d', '1m', '6m', '1y', 'all']) {
+            const response = await request(`/rewards?period=${period}&interval=day`);
+            assert.equal(response.status, 200);
+            assert.equal(response.body.interval, 'day');
+            assert.ok(response.body.data.every((day) => day.date === day.endDate && day.totalDays === 1));
+        }
+        const before = reads;
+        for (const query of ['interval=month', 'interval=', 'interval=day&interval=day', 'interval[x]=day', 'period=bad&interval=day']) {
+            const response = await request(`/rewards?${query}`);
+            assert.equal(response.status, 400, query);
+        }
+        assert.equal(reads, before);
+    });
+});

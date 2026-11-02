@@ -22,6 +22,10 @@
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
   --color-chart-partial: var(--chart-partial);
+  --color-heatmap-1: var(--heatmap-1);
+  --color-heatmap-2: var(--heatmap-2);
+  --color-heatmap-3: var(--heatmap-3);
+  --color-heatmap-4: var(--heatmap-4);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -74,6 +78,10 @@
   --chart-4: oklch(0.527 0.154 150.069);
   --chart-5: oklch(0.448 0.119 151.328);
   --chart-partial: #b45309;
+  --heatmap-1: #dcfce7;
+  --heatmap-2: #86efac;
+  --heatmap-3: #22c55e;
+  --heatmap-4: #15803d;
   --radius: 0.45rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -110,6 +118,10 @@
   --chart-4: oklch(0.527 0.154 150.069);
   --chart-5: oklch(0.448 0.119 151.328);
   --chart-partial: #fbbf24;
+  --heatmap-1: #123326;
+  --heatmap-2: #166534;
+  --heatmap-3: #22c55e;
+  --heatmap-4: #86efac;
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.723 0.219 149.579);
@@ -118,6 +130,14 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+.heatmap-missing {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 2px,
+    var(--border) 2px 3px
+  );
 }
 
 @layer base {

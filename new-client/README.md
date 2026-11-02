@@ -73,6 +73,14 @@ calcula los totales; el frontend solo filtra localmente las misiones de la porta
 El contrato y las limitaciones del almacenamiento antiguo se describen en
 [`server/README.md`](../server/README.md).
 
+El gráfico de recompensas permite alternar entre **Bars** y **Heatmap**, manteniendo
+el período seleccionado. Las barras conservan sus agrupaciones por día, semana o
+mes. El heatmap consulta `/api/v1/alerts/rewards?period=…&interval=day` y muestra un
+calendario por año, con desplazamiento horizontal en pantallas pequeñas. Los
+colores representan 0, 1–50, 51–100, 101–150 y 151+ V-Bucks diarios; los días sin
+datos se distinguen con un patrón. Cada calendario permite navegar con las
+flechas del teclado y consultar las recompensas y misiones en el tooltip.
+
 ## Verificación
 
 ```sh

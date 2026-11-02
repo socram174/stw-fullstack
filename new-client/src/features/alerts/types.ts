@@ -24,6 +24,7 @@ export interface DailyReward {
 }
 
 export type RewardPeriod = "7d" | "1m" | "6m" | "1y" | "all"
+export type RewardChartType = "bars" | "heatmap"
 
 export interface RewardBucket {
   date: string

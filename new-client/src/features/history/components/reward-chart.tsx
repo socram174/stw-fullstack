@@ -1,12 +1,15 @@
+import { ChartColumn, CalendarDays } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatDate } from "@/lib/format"
 import type {
   AlertRewardsResponse,
+  RewardChartType,
   RewardPeriod,
 } from "@/features/alerts/types"
 import { RewardBars } from "./reward-bars"
+import { RewardHeatmap } from "./reward-heatmap"
 import { RewardSummary } from "./reward-summary"
 
 const periods: { value: RewardPeriod; label: string; description: string }[] = [
@@ -18,6 +21,8 @@ const periods: { value: RewardPeriod; label: string; description: string }[] = [
 ]
 
 interface RewardChartProps {
+  chartType: RewardChartType
+  onChartTypeChange: (type: RewardChartType) => void
   period: RewardPeriod
   onPeriodChange: (period: RewardPeriod) => void
   response: AlertRewardsResponse | null
@@ -26,6 +31,8 @@ interface RewardChartProps {
 }
 
 export function RewardChart({
+  chartType,
+  onChartTypeChange,
   period,
   onPeriodChange,
   response,
@@ -52,34 +59,65 @@ export function RewardChart({
             V-Buck rewards
           </h2>
           <p className="mt-1 text-xs text-muted-foreground" aria-live="polite">
-            {period === "all"
-              ? "Monthly rewards and totals across all recorded history."
-              : `${interval} rewards and totals across all zones for this period.`}
+            {chartType === "heatmap"
+              ? "Daily rewards across all zones. Each square represents one day."
+              : period === "all"
+                ? "Monthly rewards and totals across all recorded history."
+                : `${interval} rewards and totals across all zones for this period.`}
           </p>
         </div>
-        <ToggleGroup
-          value={[period]}
-          onValueChange={(values) => {
-            const selected = periods.find((item) => item.value === values[0])
-            if (selected) onPeriodChange(selected.value)
-          }}
-          aria-label="Chart period"
-          variant="outline"
-          size="sm"
-          spacing={0}
-        >
-          {periods.map((item) => (
+        <div className="flex flex-wrap items-center gap-3">
+          <ToggleGroup
+            value={[chartType]}
+            onValueChange={(values) => {
+              const selected = values[0]
+              if (selected === "bars" || selected === "heatmap")
+                onChartTypeChange(selected)
+            }}
+            aria-label="Chart type"
+            variant="outline"
+            size="sm"
+            spacing={0}
+          >
             <ToggleGroupItem
-              key={item.value}
-              value={item.value}
-              aria-label={item.description}
-              title={item.description}
-              className="min-w-10 data-pressed:bg-primary data-pressed:text-primary-foreground sm:min-w-11"
+              value="bars"
+              className="gap-1.5 data-pressed:bg-primary data-pressed:text-primary-foreground"
             >
-              {item.label}
+              <ChartColumn className="size-3.5" aria-hidden="true" />
+              Bars
             </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+            <ToggleGroupItem
+              value="heatmap"
+              className="gap-1.5 data-pressed:bg-primary data-pressed:text-primary-foreground"
+            >
+              <CalendarDays className="size-3.5" aria-hidden="true" />
+              Heatmap
+            </ToggleGroupItem>
+          </ToggleGroup>
+          <ToggleGroup
+            value={[period]}
+            onValueChange={(values) => {
+              const selected = periods.find((item) => item.value === values[0])
+              if (selected) onPeriodChange(selected.value)
+            }}
+            aria-label="Chart period"
+            variant="outline"
+            size="sm"
+            spacing={0}
+          >
+            {periods.map((item) => (
+              <ToggleGroupItem
+                key={item.value}
+                value={item.value}
+                aria-label={item.description}
+                title={item.description}
+                className="min-w-10 data-pressed:bg-primary data-pressed:text-primary-foreground sm:min-w-11"
+              >
+                {item.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
       </div>
 
       <RewardSummary
@@ -106,7 +144,11 @@ export function RewardChart({
       {status === "success" && response && (
         <>
           {hasRecords ? (
-            <RewardBars response={response} />
+            chartType === "heatmap" ? (
+              <RewardHeatmap response={response} />
+            ) : (
+              <RewardBars response={response} />
+            )
           ) : (
             <div
               className="flex h-56 items-center justify-center text-sm text-muted-foreground"

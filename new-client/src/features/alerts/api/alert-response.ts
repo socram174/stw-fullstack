@@ -131,6 +131,8 @@ export function parseRewardsResponse(value: unknown): AlertRewardsResponse {
         bucket.date >= from &&
         bucket.endDate <= to &&
         bucket.date <= bucket.endDate &&
+        (value.interval !== "day" ||
+          (bucket.date === bucket.endDate && bucket.totalDays === 1)) &&
         integer(bucket.missions) &&
         integer(bucket.recordedDays) &&
         integer(bucket.totalDays) &&

@@ -9,8 +9,9 @@ const emptySummary = { totalVbucks: 0, missions: 0, zones: 0, minPower: null, da
 export function createAlertRepository(AlertModel = Alert, LogModel = Log) {
     const findLogs = () => LogModel.find().select('lastUpdated afterReset').lean().exec();
     return {
-        async getRewards(period, now) {
+        async getRewards(period, now, interval) {
             const window = rewardWindow(period, now);
+            if (interval) window.interval = interval;
             const days = await AlertModel.aggregate([
                 ...(period === 'all' ? [] : [{ $match: { date: { $gte: window.from, $lte: window.to } } }]),
                 { $group: {
