@@ -113,7 +113,7 @@ export function RewardBars({ response }: { response: AlertRewardsResponse }) {
                   key={bucket.date}
                   fill={
                     bucket.recordedDays < bucket.totalDays
-                      ? "var(--chart-3)"
+                      ? "var(--chart-partial)"
                       : "var(--primary)"
                   }
                 />
@@ -131,14 +131,14 @@ export function RewardBars({ response }: { response: AlertRewardsResponse }) {
                     bucket.vbucks === null
                       ? "var(--card)"
                       : bucket.recordedDays < bucket.totalDays
-                        ? "var(--chart-3)"
+                        ? "var(--chart-partial)"
                         : "var(--primary)"
                   }
                   stroke={
                     bucket.vbucks === null
                       ? "var(--muted-foreground)"
                       : bucket.recordedDays < bucket.totalDays
-                        ? "var(--chart-3)"
+                        ? "var(--chart-partial)"
                         : "var(--primary)"
                   }
                 />
@@ -153,7 +153,7 @@ export function RewardBars({ response }: { response: AlertRewardsResponse }) {
         </span>
         {hasPartial && (
           <span className="inline-flex items-center gap-2">
-            <span className="size-2 rounded-full bg-chart-3" />
+            <span className="size-2 rounded-full bg-chart-partial" />
             Partial total
           </span>
         )}
