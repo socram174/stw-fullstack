@@ -38,6 +38,26 @@ function getSystemTheme(): ResolvedTheme {
   return "light"
 }
 
+function readStoredTheme(storageKey: string, fallback: Theme): Theme {
+  try {
+    const storedTheme = localStorage.getItem(storageKey)
+    if (isTheme(storedTheme)) {
+      return storedTheme
+    }
+  } catch {
+    // Keep the theme usable when browser storage is blocked.
+  }
+  return fallback
+}
+
+function persistTheme(storageKey: string, theme: Theme) {
+  try {
+    localStorage.setItem(storageKey, theme)
+  } catch {
+    // The in-memory preference can still be applied for this visit.
+  }
+}
+
 function disableTransitionsTemporarily() {
   const style = document.createElement("style")
   style.appendChild(
@@ -83,18 +103,13 @@ export function ThemeProvider({
   disableTransitionOnChange = true,
   ...props
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = React.useState<Theme>(() => {
-    const storedTheme = localStorage.getItem(storageKey)
-    if (isTheme(storedTheme)) {
-      return storedTheme
-    }
-
-    return defaultTheme
-  })
+  const [theme, setThemeState] = React.useState<Theme>(() =>
+    readStoredTheme(storageKey, defaultTheme)
+  )
 
   const setTheme = React.useCallback(
     (nextTheme: Theme) => {
-      localStorage.setItem(storageKey, nextTheme)
+      persistTheme(storageKey, nextTheme)
       setThemeState(nextTheme)
     },
     [storageKey]
@@ -111,6 +126,7 @@ export function ThemeProvider({
 
       root.classList.remove("light", "dark")
       root.classList.add(resolvedTheme)
+      root.style.colorScheme = resolvedTheme
 
       if (restoreTransitions) {
         restoreTransitions()
@@ -166,7 +182,7 @@ export function ThemeProvider({
                 ? "light"
                 : "dark"
 
-        localStorage.setItem(storageKey, nextTheme)
+        persistTheme(storageKey, nextTheme)
         return nextTheme
       })
     }
@@ -180,7 +196,13 @@ export function ThemeProvider({
 
   React.useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.storageArea !== localStorage) {
+      let storage: Storage
+      try {
+        storage = localStorage
+      } catch {
+        return
+      }
+      if (event.storageArea !== storage) {
         return
       }
 

@@ -2,6 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Keep the storage key and fallback in sync with ThemeProvider. -->
+    <script>
+      ;(() => {
+        let theme = "system"
+        try {
+          const storedTheme = localStorage.getItem("theme")
+          if (["light", "dark", "system"].includes(storedTheme)) {
+            theme = storedTheme
+          }
+        } catch {
+          // Storage may be unavailable; still respect the system preference.
+        }
+        const resolvedTheme =
+          theme === "system"
+            ? window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light"
+            : theme
+        const root = document.documentElement
+        root.classList.remove("light", "dark")
+        root.classList.add(resolvedTheme)
+        root.style.colorScheme = resolvedTheme
+      })()
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#102d24" />
