@@ -6,12 +6,79 @@ import {
   ReferenceDot,
   ResponsiveContainer,
   Tooltip,
+  useIsTooltipActive,
   XAxis,
   YAxis,
+  ZIndexLayer,
 } from "recharts"
 import { formatDate, formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import type { AlertRewardsResponse } from "@/features/alerts/types"
+
+function RewardPlot({ data }: Pick<AlertRewardsResponse, "data">) {
+  const isTooltipActive = useIsTooltipActive()
+  const style = {
+    opacity: isTooltipActive ? 0.35 : 1,
+    transition: "opacity 300ms ease-in-out",
+  }
+
+  return (
+    <>
+      <ZIndexLayer zIndex={300}>
+        <g style={style}>
+          <Bar
+            dataKey="vbucks"
+            fill="var(--primary)"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={36}
+            isAnimationActive="auto"
+            zIndex={0}
+          >
+            {data.map((bucket) => (
+              <Cell
+                key={bucket.date}
+                fill={
+                  bucket.recordedDays < bucket.totalDays
+                    ? "var(--chart-partial)"
+                    : "var(--primary)"
+                }
+              />
+            ))}
+          </Bar>
+        </g>
+      </ZIndexLayer>
+      <ZIndexLayer zIndex={600}>
+        <g style={style}>
+          {data
+            .filter((bucket) => bucket.vbucks === null || bucket.vbucks === 0)
+            .map((bucket) => (
+              <ReferenceDot
+                key={bucket.date}
+                x={bucket.date}
+                y={0}
+                r={3}
+                zIndex={0}
+                fill={
+                  bucket.vbucks === null
+                    ? "var(--card)"
+                    : bucket.recordedDays < bucket.totalDays
+                      ? "var(--chart-partial)"
+                      : "var(--primary)"
+                }
+                stroke={
+                  bucket.vbucks === null
+                    ? "var(--muted-foreground)"
+                    : bucket.recordedDays < bucket.totalDays
+                      ? "var(--chart-partial)"
+                      : "var(--primary)"
+                }
+              />
+            ))}
+        </g>
+      </ZIndexLayer>
+    </>
+  )
+}
 
 export function RewardBars({ response }: { response: AlertRewardsResponse }) {
   const { data, interval } = response
@@ -136,48 +203,7 @@ export function RewardBars({ response }: { response: AlertRewardsResponse }) {
                 )
               }}
             />
-            <Bar
-              dataKey="vbucks"
-              fill="var(--primary)"
-              radius={[4, 4, 0, 0]}
-              maxBarSize={36}
-              isAnimationActive="auto"
-            >
-              {data.map((bucket) => (
-                <Cell
-                  key={bucket.date}
-                  fill={
-                    bucket.recordedDays < bucket.totalDays
-                      ? "var(--chart-partial)"
-                      : "var(--primary)"
-                  }
-                />
-              ))}
-            </Bar>
-            {data
-              .filter((bucket) => bucket.vbucks === null || bucket.vbucks === 0)
-              .map((bucket) => (
-                <ReferenceDot
-                  key={bucket.date}
-                  x={bucket.date}
-                  y={0}
-                  r={3}
-                  fill={
-                    bucket.vbucks === null
-                      ? "var(--card)"
-                      : bucket.recordedDays < bucket.totalDays
-                        ? "var(--chart-partial)"
-                        : "var(--primary)"
-                  }
-                  stroke={
-                    bucket.vbucks === null
-                      ? "var(--muted-foreground)"
-                      : bucket.recordedDays < bucket.totalDays
-                        ? "var(--chart-partial)"
-                        : "var(--primary)"
-                  }
-                />
-              ))}
+            <RewardPlot data={data} />
           </BarChart>
         </ResponsiveContainer>
       </div>
