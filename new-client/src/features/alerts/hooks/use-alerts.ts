@@ -40,6 +40,8 @@ function useAlertRequest<T>(
   return {
     status: current?.status ?? "loading",
     data: current?.data ?? null,
+    // Retain the previous result for sizing loading placeholders only.
+    lastData: state?.data ?? null,
     refetch: () => setAttempt((value) => value + 1),
   }
 }

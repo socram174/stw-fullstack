@@ -4,7 +4,6 @@ import { useSearchParams } from "react-router"
 import { Button } from "@/components/ui/button"
 import { FeedbackState } from "@/components/shared/feedback-state"
 import { PageHeading } from "@/components/shared/page-heading"
-import { AlertsSkeleton } from "@/features/alerts/components/alerts-skeleton"
 import {
   useAlertHistory,
   useAlertRewards,
@@ -19,6 +18,7 @@ import {
   HistoryTable,
 } from "@/features/history/components/history-table"
 import { RewardChart } from "@/features/history/components/reward-chart"
+import { HistoryTableSkeleton } from "@/features/history/components/history-table-skeleton"
 
 export default function HistoryPage() {
   const [chartPeriod, setChartPeriod] = useState<RewardPeriod>("1m")
@@ -42,11 +42,17 @@ export default function HistoryPage() {
   for (const [key, value] of Object.entries({ q: search, zone, from, to })) {
     if (value) query.set(key, value)
   }
-  const { data: response, status, refetch } = useAlertHistory(query.toString())
+  const {
+    data: response,
+    lastData,
+    status,
+    refetch,
+  } = useAlertHistory(query.toString())
   const total = response?.pagination.total ?? 0
   const hasFilters = Boolean(search || zone || from || to || sort !== "recent")
   const loading = status === "loading"
   const ready = status === "success"
+  const tableResponse = response ?? (loading ? lastData : null)
 
   function updateParams(values: Record<string, string>, replace = true) {
     setParams(
@@ -139,7 +145,32 @@ export default function HistoryPage() {
           onApply={updateFilters}
           onClear={() => setParams({}, { replace: true })}
         />
-        {loading && <AlertsSkeleton />}
+        {(loading || (ready && total > 0)) && (
+          <div className="relative" aria-busy={loading}>
+            {tableResponse && tableResponse.pagination.total > 0 && (
+              <div
+                className={loading ? "invisible" : undefined}
+                aria-hidden={loading || undefined}
+              >
+                <HistoryTable
+                  alerts={tableResponse.data}
+                  pagination={tableResponse.pagination}
+                  onPageChange={(next) =>
+                    updateParams({ page: String(next) }, false)
+                  }
+                />
+              </div>
+            )}
+            {loading && (
+              <HistoryTableSkeleton
+                rows={tableResponse?.data.length || HISTORY_PAGE_SIZE}
+                overlay={Boolean(
+                  tableResponse && tableResponse.pagination.total > 0
+                )}
+              />
+            )}
+          </div>
+        )}
         {status === "error" && (
           <FeedbackState
             error
@@ -173,13 +204,6 @@ export default function HistoryPage() {
               </Button>
             )}
           </FeedbackState>
-        )}
-        {ready && response && total > 0 && (
-          <HistoryTable
-            alerts={response.data}
-            pagination={response.pagination}
-            onPageChange={(next) => updateParams({ page: String(next) }, false)}
-          />
         )}
       </section>
     </div>
