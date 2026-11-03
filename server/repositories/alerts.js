@@ -3,12 +3,18 @@ import Log from '../models/Log.js';
 import { buildLatest, normalizeAlerts, parseAlertDate } from '../services/alert-data.js';
 import { historyFacet, historySelection, historySort, normalizedAlertStage } from '../services/alert-pipeline.js';
 import { buildRewardSeries, rewardWindow } from '../services/alert-rewards.js';
+import { buildZoneStats, zoneStatsPipeline } from '../services/alert-zones.js';
 
 const emptySummary = { totalVbucks: 0, missions: 0, zones: 0, minPower: null, days: 0 };
 
 export function createAlertRepository(AlertModel = Alert, LogModel = Log) {
     const findLogs = () => LogModel.find().select('lastUpdated afterReset').lean().exec();
     return {
+        async getZones(period, now) {
+            const window = rewardWindow(period, now);
+            const [facet] = await AlertModel.aggregate(zoneStatsPipeline(window)).exec();
+            return buildZoneStats(facet, window);
+        },
         async getRewards(period, now, interval) {
             const window = rewardWindow(period, now);
             if (interval) window.interval = interval;

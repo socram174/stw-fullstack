@@ -2,6 +2,13 @@ import { parseAlertDate } from '../services/alert-data.js';
 
 export class InvalidQuery extends Error {}
 
+export function parseZoneQuery(query) {
+    if (Object.keys(query).some((key) => key !== 'period')) {
+        throw new InvalidQuery('Only period is supported for zone statistics.');
+    }
+    return parseRewardQuery(query);
+}
+
 export function parseRewardQuery(query) {
     if (Object.keys(query).some((key) => !['period', 'interval'].includes(key))) {
         throw new InvalidQuery('Only period and interval are supported for reward charts.');

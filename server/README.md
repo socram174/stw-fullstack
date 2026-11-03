@@ -60,6 +60,20 @@ missing days have `vbucks: null`, while recorded zero-reward days have `vbucks: 
 Omitting `interval` keeps the weekly/monthly aggregation above. Other interval
 values are rejected. For example: `/api/v1/alerts/rewards?period=1y&interval=day`.
 
+### `GET /api/v1/alerts/zones`
+
+Returns zone rankings across every mission in the selected period, independently
+of history pagination or table filters. Supports only `period` (`7d`, `1m`, `6m`,
+`1y`, `all`), defaulting to `1m`; invalid or repeated parameters return `400`.
+
+Returns `{ period, from, to, recordedDays, totalDays, data }`. Each data row is
+`{ zone, vbucks, missions }`, sorted by rewards descending and zone name for ties.
+Zero-reward placeholders count toward distinct recorded-day coverage and archive
+bounds, while rankings include only positive-reward missions. Unknown zones stay
+visible as `Unknown zone`. An empty ranking can therefore have known recording
+coverage and zero missions. MongoDB computes totals before returning the bounded
+set of zone groups; individual mission documents are not loaded into Node.js.
+
 ### `GET /api/v1/alerts`
 
 Example: `/api/v1/alerts?from=2026-10-01&to=2026-10-31&sort=recent&page=1&limit=15`

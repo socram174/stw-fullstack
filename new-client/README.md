@@ -81,6 +81,20 @@ colores representan 0, 1–50, 51–100, 101–150 y 151+ V-Bucks diarios; los d
 datos se distinguen con un patrón. Cada calendario permite navegar con las
 flechas del teclado y consultar las recompensas y misiones en el tooltip.
 
+La sección **Insights** ofrece tres análisis independientes de la tabla:
+
+- **Compare years** consulta la serie mensual completa y permite seleccionar
+  años y alternar entre total mensual y promedio por día registrado. Los meses
+  incompletos se marcan en ámbar; los meses sin datos quedan como huecos.
+- **Days & streaks** consulta datos diarios para el período seleccionado. El
+  porcentaje excluye días sin registros y las rachas se interrumpen en cada
+  hueco. Los días registrados con cero recompensas sí cuentan en el análisis.
+- **Zones** consulta `/api/v1/alerts/zones?period=…`, que agrega todas las
+  misiones del período. Permite ordenar por V-Bucks o misiones; al elegir una
+  zona se abre el archivo filtrado por esa zona y el rango de fechas del análisis.
+
+Solo se carga el análisis activo. El botón **Refresh** también actualiza Insights.
+
 ## Verificación
 
 ```sh

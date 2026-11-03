@@ -1,6 +1,7 @@
 import type {
   AlertHistoryResponse,
   AlertRewardsResponse,
+  AlertZonesResponse,
   AlertSummary,
   LatestAlertsResponse,
   MissionAlert,
@@ -146,4 +147,43 @@ export function parseRewardsResponse(value: unknown): AlertRewardsResponse {
     throw new Error("Invalid alert rewards response.")
   }
   return value as unknown as AlertRewardsResponse
+}
+
+export function parseZonesResponse(value: unknown): AlertZonesResponse {
+  if (
+    !record(value) ||
+    !["7d", "1m", "6m", "1y", "all"].includes(String(value.period)) ||
+    !date(value.from) ||
+    !date(value.to) ||
+    value.from > value.to ||
+    !integer(value.recordedDays) ||
+    !integer(value.totalDays) ||
+    value.totalDays < 1 ||
+    value.recordedDays > value.totalDays ||
+    !Array.isArray(value.data) ||
+    !value.data.every(
+      (zone) =>
+        record(zone) &&
+        typeof zone.zone === "string" &&
+        zone.zone.trim().length > 0 &&
+        nonNegative(zone.vbucks) &&
+        zone.vbucks > 0 &&
+        integer(zone.missions) &&
+        zone.missions > 0
+    ) ||
+    (value.recordedDays === 0 && value.data.length > 0)
+  )
+    throw new Error("Invalid zone statistics response.")
+  const totalDays =
+    Math.round(
+      (Date.parse(`${value.to}T00:00:00Z`) -
+        Date.parse(`${value.from}T00:00:00Z`)) /
+        86_400_000
+    ) + 1
+  if (
+    value.totalDays !== totalDays ||
+    new Set(value.data.map((zone) => zone.zone)).size !== value.data.length
+  )
+    throw new Error("Invalid zone statistics response.")
+  return value as unknown as AlertZonesResponse
 }

@@ -19,11 +19,13 @@ import {
 } from "@/features/history/components/history-table"
 import { RewardChart } from "@/features/history/components/reward-chart"
 import { HistoryTableSkeleton } from "@/features/history/components/history-table-skeleton"
+import { HistoryInsights } from "@/features/history/components/history-insights"
 
 export default function HistoryPage() {
   const [chartPeriod, setChartPeriod] = useState<RewardPeriod>("1m")
   const [chartType, setChartType] = useState<RewardChartType>("bars")
   const chart = useAlertRewards(chartPeriod, chartType)
+  const [insightsRefresh, setInsightsRefresh] = useState(0)
   const [params, setParams] = useSearchParams()
   const search = params.get("q") ?? ""
   const zone = params.get("zone") ?? ""
@@ -79,6 +81,18 @@ export default function HistoryPage() {
     })
   }
 
+  function exploreZone(zone: string, from: string, to: string) {
+    setParams(new URLSearchParams({ zone, from, to }))
+    const heading = document.getElementById("history-heading")
+    heading?.focus({ preventScroll: true })
+    heading?.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+      block: "start",
+    })
+  }
+
   return (
     <div className="space-y-8">
       <title>V-Buck history · STW Alerts</title>
@@ -100,6 +114,7 @@ export default function HistoryPage() {
           onClick={() => {
             refetch()
             chart.refetch()
+            setInsightsRefresh((value) => value + 1)
           }}
           disabled={loading}
         >
@@ -121,11 +136,17 @@ export default function HistoryPage() {
         onRetry={chart.refetch}
       />
 
+      <HistoryInsights
+        refreshKey={insightsRefresh}
+        onExploreZone={exploreZone}
+      />
+
       <section aria-labelledby="history-heading" className="space-y-4">
         <div>
           <h2
             id="history-heading"
-            className="text-xl font-semibold tracking-tight"
+            tabIndex={-1}
+            className="scroll-mt-6 text-xl font-semibold tracking-tight outline-none"
           >
             Mission archive
           </h2>

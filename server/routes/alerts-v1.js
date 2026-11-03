@@ -7,6 +7,7 @@ export function createAlertRouter(repository) {
     const controllers = createAlertControllers(repository);
     router.get('/latest', controllers.latest);
     router.get('/rewards', controllers.rewards);
+    router.get('/zones', controllers.zones);
     router.get('/', controllers.history);
     router.use((req, res) => res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Alert endpoint not found.' } }));
     router.use((error, req, res, next) => {

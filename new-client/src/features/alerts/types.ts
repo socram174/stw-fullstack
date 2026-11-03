@@ -43,6 +43,21 @@ export interface AlertRewardsResponse {
   data: RewardBucket[]
 }
 
+export interface ZoneReward {
+  zone: string
+  vbucks: number
+  missions: number
+}
+
+export interface AlertZonesResponse {
+  period: RewardPeriod
+  from: string
+  to: string
+  recordedDays: number
+  totalDays: number
+  data: ZoneReward[]
+}
+
 export interface AlertSummary {
   totalVbucks: number
   missions: number

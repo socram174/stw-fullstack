@@ -3,6 +3,7 @@ import {
   fetchAlertHistory,
   fetchLatestAlerts,
   fetchAlertRewards,
+  fetchAlertZones,
 } from "../api/alerts-api"
 import type { RewardChartType, RewardPeriod } from "../types"
 
@@ -58,6 +59,13 @@ const history = (query: string, signal: AbortSignal) =>
 
 export function useAlertHistory(query: string) {
   return useAlertRequest(query, history)
+}
+
+const zones = (period: string, signal: AbortSignal) =>
+  fetchAlertZones(period as RewardPeriod, signal)
+
+export function useAlertZones(period: RewardPeriod) {
+  return useAlertRequest(period, zones)
 }
 
 const rewards = (key: string, signal: AbortSignal) => {

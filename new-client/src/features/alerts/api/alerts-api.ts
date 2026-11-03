@@ -1,5 +1,9 @@
 import { apiRequest } from "@/lib/http"
-import { parseHistoryResponse, parseRewardsResponse } from "./alert-response"
+import {
+  parseHistoryResponse,
+  parseRewardsResponse,
+  parseZonesResponse,
+} from "./alert-response"
 import { loadLatestAlerts } from "./latest-alerts-cache"
 import type { RewardPeriod } from "../types"
 
@@ -31,5 +35,17 @@ export async function fetchAlertRewards(
   if (response.period !== period) throw new Error("Unexpected rewards period.")
   if (interval && response.interval !== interval)
     throw new Error("Unexpected rewards interval.")
+  return response
+}
+
+export async function fetchAlertZones(
+  period: RewardPeriod,
+  signal: AbortSignal
+) {
+  const response = parseZonesResponse(
+    await apiRequest(`/api/v1/alerts/zones?period=${period}`, { signal })
+  )
+  if (response.period !== period)
+    throw new Error("Unexpected zone statistics period.")
   return response
 }
